@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Shield, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
-export default function Register() {
+function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -193,5 +193,13 @@ export default function Register() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Register() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center"><Loader2 className="animate-spin text-amber-500 w-12 h-12" /></div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }

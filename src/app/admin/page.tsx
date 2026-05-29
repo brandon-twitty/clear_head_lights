@@ -8,6 +8,7 @@ import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import Link from "next/link";
+import { sendInviteEmail } from "@/actions/sendEmail";
 
 interface Lead {
   id: string;
@@ -25,6 +26,7 @@ export default function AdminPortal() {
   const { user, role, loading } = useAuth();
   const router = useRouter();
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [processingId, setProcessingId] = useState<string | null>(null);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,6 +50,7 @@ export default function AdminPortal() {
   }, [user]);
 
   const generateInvite = async (lead: Lead) => {
+    setProcessingId(lead.id);
     const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     
     try {
@@ -59,17 +62,34 @@ export default function AdminPortal() {
         createdAt: serverTimestamp()
       });
       
+      const appUrl = window.location.origin;
+      
+      // Dispatch the server action to send the email
+      const emailResult = await sendInviteEmail(
+        lead.email,
+        lead.dealership,
+        token,
+        appUrl
+      );
+
+      if (!emailResult.success) {
+        alert("Invite generated, but email failed to send: " + emailResult.error);
+        console.error(emailResult.error);
+      }
+      
       await updateDoc(doc(db, "leads", lead.id), {
         status: "contacted"
       });
 
-      const inviteLink = `${window.location.origin}/register?token=${token}`;
+      const inviteLink = `${appUrl}/register?token=${token}`;
       await navigator.clipboard.writeText(inviteLink);
       setCopiedToken(lead.id);
       setTimeout(() => setCopiedToken(null), 3000);
     } catch (error) {
       console.error("Error generating invite:", error);
       alert("Failed to generate invite. Check console.");
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -172,12 +192,15 @@ export default function AdminPortal() {
                         <div className="flex gap-2">
                           <button 
                             onClick={() => generateInvite(lead)}
-                            className="flex-1 flex items-center justify-center bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 text-xs font-bold py-2 rounded transition"
+                            disabled={processingId === lead.id}
+                            className="flex-1 flex items-center justify-center bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 text-xs font-bold py-2 rounded transition disabled:opacity-50"
                           >
-                            {copiedToken === lead.id ? (
-                              <><CheckCircle2 className="w-3 h-3 mr-1" /> Copied Link!</>
+                            {processingId === lead.id ? (
+                              <>Sending...</>
+                            ) : copiedToken === lead.id ? (
+                              <><CheckCircle2 className="w-3 h-3 mr-1" /> Sent & Copied!</>
                             ) : (
-                              <><LinkIcon className="w-3 h-3 mr-1" /> Gen Invite Link</>
+                              <><LinkIcon className="w-3 h-3 mr-1" /> Gen Invite & Email</>
                             )}
                           </button>
                         </div>
