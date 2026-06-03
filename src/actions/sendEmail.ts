@@ -14,7 +14,7 @@ export async function sendInviteEmail(
     const inviteLink = `${appUrl}/register?token=${inviteToken}`;
     
     const { data, error } = await resend.emails.send({
-      from: "Kelley's Clear Lights <onboarding@resend.dev>", // resend.dev is for testing only
+      from: "Kelley's Clear Lights <noreply@stlclearheadlights.com>",
       to: [email],
       subject: `Activate your Dealership Portal - Kelley's Clear Lights`,
       html: `
