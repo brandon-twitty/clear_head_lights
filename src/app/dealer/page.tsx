@@ -73,13 +73,18 @@ export default function DealerPortal() {
               </div>
             </div>
 
-            <div className="bg-slate-900 rounded-xl border border-slate-800 p-8 text-center py-16">
-              <Calendar className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-white mb-2">Request Service</h2>
-              <p className="text-slate-400 mb-6 max-w-md mx-auto">Ready to prep your aged inventory for the front line? Schedule a mobile visit today.</p>
-              <button className="bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-lg font-bold transition">
-                Create New Request
-              </button>
+            <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden h-[700px] relative">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                <p className="text-slate-500">Loading Calendar...</p>
+              </div>
+              <iframe 
+                src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2wj_MPuipVnuRsVgwyMSv5jPZfVrekqICPJyiapzz3w5336ykdtJElsKavW9bZUm1ou79Fkqv7?gv=true" 
+                style={{ border: 0 }} 
+                width="100%" 
+                height="100%" 
+                className="absolute inset-0 z-10 bg-white"
+                title="Schedule Service"
+              ></iframe>
             </div>
           </div>
         </main>

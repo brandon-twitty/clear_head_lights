@@ -9,7 +9,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Current Architecture & State
 - **Project Scope:** We are building a B2B Dealership Portal, an Admin CRM, and an automated Lead Intake system for Kelley's Clear Headlights.
 - **Tech Stack:** Next.js App Router (Turbopack), Tailwind CSS, Firebase (Auth & Firestore).
-- **Deployment:** Deployed to Firebase Hosting via `npx firebase-tools deploy` (using the Web Frameworks experiment). Not currently using the new "App Hosting" GitHub integration.
+- **Deployment:** Deployed to Firebase App Hosting (CI/CD via GitHub).
 - **Database Schema:** We rely on `users` (stores custom `role: 'admin' | 'dealer'`), `leads`, `invites`, and `appointments`. Secured tightly by `firestore.rules`.
 
 ## Important Rules & Reminders
@@ -18,5 +18,5 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Resend Free Tier Limitation:** Until the user verifies a domain at resend.com, testing emails MUST be sent to the exact same email address the user used to sign up for Resend, or they will fail.
 
 ## Where We Left Off (Next Action)
-- We were deciding how to build the **Dealer Scheduling System**.
-- **Pending Decision:** Does the user want Option A (embedding a native Google Calendar Appointment Scheduling `iframe` into `/dealer` for zero-bug calendar syncing) or Option B (building a custom native UI that saves to the Firestore `appointments` collection)? Wait for the user's decision before proceeding.
+- User decided to go with Option A for the Dealer Scheduling System (embedding a Google Calendar Appointment iframe).
+- **Pending Action:** The user needs to paste their actual Google Calendar scheduling URL into the `iframe src` placeholder in `src/app/dealer/page.tsx`.
