@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Shield, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
@@ -76,9 +76,13 @@ function RegisterContent() {
         createdAt: new Date().toISOString()
       });
 
-      // 3. Delete the one-time invite token
+      // 3. Delete the one-time invite token and mark lead as active
       if (token) {
         await deleteDoc(doc(db, "invites", token));
+      }
+      
+      if (invite.leadId) {
+        await updateDoc(doc(db, "leads", invite.leadId), { status: "active" });
       }
 
       // 4. Redirect to their new portal

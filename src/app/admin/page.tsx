@@ -198,36 +198,40 @@ export default function AdminPortal() {
                 <h1 className="text-3xl font-bold text-white mb-2">Overview</h1>
                 <p className="text-slate-400 mb-8">Monitor revenue, upcoming appointments, and new dealership leads.</p>
 
-                <div className="grid md:grid-cols-4 gap-6 mb-8">
-                  <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 className="text-slate-400 font-medium text-sm mb-1">Total Unpaid</h3>
-                    <p className="text-3xl font-bold text-white">${invoices.filter(i => i.status === 'pending').reduce((a, b) => a + b.amount, 0).toFixed(2)}</p>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-8">
+                  <div className="bg-slate-900 p-4 lg:p-6 rounded-xl border border-slate-800">
+                    <h3 className="text-slate-400 font-medium text-xs lg:text-sm mb-1">Total Unpaid</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-white">${invoices.filter(i => i.status === 'pending').reduce((a, b) => a + b.amount, 0).toFixed(2)}</p>
                   </div>
-                  <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 className="text-slate-400 font-medium text-sm mb-1">Total Paid</h3>
-                    <p className="text-3xl font-bold text-emerald-400">${invoices.filter(i => i.status === 'paid').reduce((a, b) => a + b.amount, 0).toFixed(2)}</p>
+                  <div className="bg-slate-900 p-4 lg:p-6 rounded-xl border border-slate-800">
+                    <h3 className="text-slate-400 font-medium text-xs lg:text-sm mb-1">Total Paid</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-emerald-400">${invoices.filter(i => i.status === 'paid').reduce((a, b) => a + b.amount, 0).toFixed(2)}</p>
                   </div>
-                  <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 className="text-slate-400 font-medium text-sm mb-1">Pending Leads</h3>
-                    <p className="text-3xl font-bold text-amber-400">{leads.filter(l => l.status === "new").length}</p>
+                  <div className="bg-slate-900 p-4 lg:p-6 rounded-xl border border-slate-800">
+                    <h3 className="text-slate-400 font-medium text-xs lg:text-sm mb-1">Pending Leads</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-amber-400">{leads.filter(l => l.status === "new").length}</p>
                   </div>
-                  <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
-                    <h3 className="text-slate-400 font-medium text-sm mb-1">Active Dealerships</h3>
-                    <p className="text-3xl font-bold text-white">{dealers.length}</p>
+                  <div className="bg-slate-900 p-4 lg:p-6 rounded-xl border border-slate-800">
+                    <h3 className="text-slate-400 font-medium text-xs lg:text-sm mb-1">Invited Leads</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-blue-400">{leads.filter(l => l.status === "contacted").length}</p>
+                  </div>
+                  <div className="bg-slate-900 p-4 lg:p-6 rounded-xl border border-slate-800">
+                    <h3 className="text-slate-400 font-medium text-xs lg:text-sm mb-1">Active Dealerships</h3>
+                    <p className="text-2xl lg:text-3xl font-bold text-white">{dealers.length}</p>
                   </div>
                 </div>
 
                 <div className="bg-slate-900 rounded-xl border border-slate-800 p-6 flex flex-col h-[500px]">
                   <h2 className="text-xl font-bold text-white mb-4 flex items-center justify-between">
                     Recent Leads 
-                    <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded-full">{leads.length} Total</span>
+                    <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded-full">{leads.filter(l => l.status !== "active").length} Queue</span>
                   </h2>
                   
                   <div className="overflow-y-auto pr-2 space-y-4 flex-1">
-                    {leads.length === 0 ? (
-                      <div className="text-slate-500 text-sm py-8 text-center border-2 border-dashed border-slate-800 rounded-lg">No new leads found.</div>
+                    {leads.filter(l => l.status !== "active").length === 0 ? (
+                      <div className="text-slate-500 text-sm py-8 text-center border-2 border-dashed border-slate-800 rounded-lg">No leads in the queue.</div>
                     ) : (
-                      leads.map(lead => (
+                      leads.filter(l => l.status !== "active").map(lead => (
                         <div key={lead.id} className={`bg-slate-950 p-4 rounded-lg border transition ${lead.status === 'contacted' ? 'border-slate-800 opacity-70' : 'border-amber-500/30'}`}>
                           <div className="flex justify-between items-start mb-2">
                             <div>
