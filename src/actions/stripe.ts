@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2024-06-20", // using standard modern version
+  apiVersion: "2026-05-27.dahlia", // matching installed types
 });
 
 export async function createCheckoutSession(invoiceId: string, amount: number, dealerEmail: string, description: string) {
