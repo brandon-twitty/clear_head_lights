@@ -46,7 +46,8 @@ service cloud.firestore {
     
     // Leads Collection
     match /leads/{leadId} {
-      allow read, update, delete: if isAdmin();
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin() || (request.auth != null && request.resource.data.status == 'active');
       allow create: if true; // Public can submit leads
     }
   }
