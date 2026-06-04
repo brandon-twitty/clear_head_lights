@@ -3,10 +3,10 @@
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Users, FileText, Calendar, LogOut, BarChart, Phone, Mail, Link as LinkIcon, CheckCircle2, DollarSign, Send } from "lucide-react";
+import { Users, FileText, Calendar, LogOut, BarChart, Phone, Mail, Link as LinkIcon, CheckCircle2, DollarSign, Send, Trash2 } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp, updateDoc, addDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 import Link from "next/link";
 import { sendInviteEmail } from "@/actions/sendEmail";
 import { sendInvoiceReminder } from "@/actions/sendReminder";
@@ -21,6 +21,7 @@ interface Lead {
   notes: string;
   status: string;
   createdAt: any;
+  invitedAt?: any;
 }
 
 interface UserDoc {
@@ -108,7 +109,7 @@ export default function AdminPortal() {
         alert("Invite generated, but email failed to send: " + emailResult.error);
       }
       
-      await updateDoc(doc(db, "leads", lead.id), { status: "contacted" });
+      await updateDoc(doc(db, "leads", lead.id), { status: "contacted", invitedAt: serverTimestamp() });
 
       const inviteLink = `${appUrl}/register?token=${token}`;
       await navigator.clipboard.writeText(inviteLink);
@@ -141,6 +142,17 @@ export default function AdminPortal() {
     } catch (err) {
       console.error(err);
       alert("Failed to create invoice");
+    }
+  };
+
+  const handleDeleteLead = async (leadId: string) => {
+    if (confirm("Are you sure you want to delete this lead?")) {
+      try {
+        await deleteDoc(doc(db, "leads", leadId));
+      } catch (err) {
+        console.error("Error deleting lead:", err);
+        alert("Failed to delete lead.");
+      }
     }
   };
 
@@ -209,7 +221,7 @@ export default function AdminPortal() {
                   </div>
                   <div className="bg-slate-900 p-4 lg:p-6 rounded-xl border border-slate-800">
                     <h3 className="text-slate-400 font-medium text-xs lg:text-sm mb-1">Pending Leads</h3>
-                    <p className="text-2xl lg:text-3xl font-bold text-amber-400">{leads.filter(l => l.status === "new").length}</p>
+                    <p className="text-2xl lg:text-3xl font-bold text-amber-400">{leads.filter(l => l.status !== "active").length}</p>
                   </div>
                   <div className="bg-slate-900 p-4 lg:p-6 rounded-xl border border-slate-800">
                     <h3 className="text-slate-400 font-medium text-xs lg:text-sm mb-1">Invited Leads</h3>
@@ -238,9 +250,21 @@ export default function AdminPortal() {
                               <h4 className="text-white font-bold">{lead.dealership}</h4>
                               <p className="text-slate-400 text-sm">{lead.name}</p>
                             </div>
-                            <span className={`text-xs font-medium px-2 py-1 rounded border ${lead.status === 'contacted' ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
-                              {lead.status === 'contacted' ? 'Invited' : 'New Lead'}
-                            </span>
+                            <div className="flex flex-col items-end gap-1">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-xs font-medium px-2 py-1 rounded border ${lead.status === 'contacted' ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
+                                  {lead.status === 'contacted' ? 'Invited' : 'New Lead'}
+                                </span>
+                                <button onClick={() => handleDeleteLead(lead.id)} className="text-red-400 hover:text-red-300 transition p-1" title="Delete Lead">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                              {lead.status === 'contacted' && lead.invitedAt && (
+                                <span className="text-[10px] text-slate-500">
+                                  Sent: {lead.invitedAt.toDate ? new Date(lead.invitedAt.toDate()).toLocaleDateString() : new Date(lead.invitedAt).toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center space-x-4 text-xs text-slate-500 mb-3">
                             <a href={`tel:${lead.phone}`} className="flex items-center hover:text-amber-400 transition"><Phone className="w-3 h-3 mr-1" /> {lead.phone}</a>
