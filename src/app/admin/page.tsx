@@ -71,6 +71,7 @@ export default function AdminPortal() {
   const [newInvoiceAmount, setNewInvoiceAmount] = useState("");
   const [newInvoiceDesc, setNewInvoiceDesc] = useState("");
   const [creatingInvoiceFor, setCreatingInvoiceFor] = useState<string | null>(null);
+  const [selectedDealer, setSelectedDealer] = useState<UserDoc | null>(null);
   const [remindingInvoiceId, setRemindingInvoiceId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -208,16 +209,16 @@ export default function AdminPortal() {
       <div className="flex h-[calc(100vh-64px)]">
         <aside className="w-64 bg-slate-900 border-r border-slate-800 p-4 hidden md:block">
           <nav className="space-y-2">
-            <button onClick={() => setActiveTab("dashboard")} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'dashboard' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <button onClick={() => { setActiveTab("dashboard"); setSelectedDealer(null); }} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'dashboard' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <BarChart className="w-5 h-5 mr-3" /> Dashboard
             </button>
-            <button onClick={() => setActiveTab("dealerships")} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'dealerships' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <button onClick={() => { setActiveTab("dealerships"); setSelectedDealer(null); }} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'dealerships' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <Users className="w-5 h-5 mr-3" /> Dealerships
             </button>
-            <button onClick={() => setActiveTab("invoices")} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'invoices' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <button onClick={() => { setActiveTab("invoices"); setSelectedDealer(null); }} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'invoices' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <FileText className="w-5 h-5 mr-3" /> Invoices
             </button>
-            <button onClick={() => setActiveTab("appointments")} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'appointments' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <button onClick={() => { setActiveTab("appointments"); setSelectedDealer(null); }} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'appointments' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <Calendar className="w-5 h-5 mr-3" /> Appointments
             </button>
           </nav>
@@ -310,32 +311,93 @@ export default function AdminPortal() {
 
             {activeTab === 'dealerships' && (
               <>
-                <h1 className="text-3xl font-bold text-white mb-6">Registered Dealerships</h1>
-                <div className="space-y-4">
-                  {dealers.map(dealer => (
-                    <div key={dealer.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col md:flex-row justify-between items-center">
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{dealer.dealership || dealer.name}</h3>
-                        <p className="text-slate-400 text-sm">{dealer.email}</p>
+                {selectedDealer ? (
+                  <div>
+                    <button onClick={() => setSelectedDealer(null)} className="text-amber-500 hover:text-amber-400 text-sm font-bold flex items-center mb-6">
+                      &larr; Back to Dealerships
+                    </button>
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 mb-8">
+                      <h1 className="text-3xl font-bold text-white mb-2">{selectedDealer.dealership || selectedDealer.name}</h1>
+                      <div className="text-slate-400 space-y-1 mb-6">
+                        <p><span className="font-bold text-slate-300">Contact:</span> {selectedDealer.name}</p>
+                        <p><span className="font-bold text-slate-300">Email:</span> {selectedDealer.email}</p>
+                        <p><span className="font-bold text-slate-300">Address:</span> {(selectedDealer as any).address || "No address on file"}</p>
+                        <p><span className="font-bold text-slate-300">Registered:</span> {selectedDealer.createdAt ? new Date(selectedDealer.createdAt).toLocaleDateString() : 'Unknown'}</p>
                       </div>
                       
-                      <div className="mt-4 md:mt-0 flex flex-col items-end">
-                        {creatingInvoiceFor === dealer.id ? (
-                          <div className="flex gap-2 items-center">
-                            <input type="text" placeholder="Desc (e.g. 3 cars)" value={newInvoiceDesc} onChange={(e) => setNewInvoiceDesc(e.target.value)} className="bg-slate-950 border border-slate-800 text-white px-3 py-2 rounded text-sm w-40" />
-                            <input type="number" placeholder="$ Amount" value={newInvoiceAmount} onChange={(e) => setNewInvoiceAmount(e.target.value)} className="bg-slate-950 border border-slate-800 text-white px-3 py-2 rounded text-sm w-28" />
-                            <button onClick={() => handleCreateInvoice(dealer)} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded text-sm font-bold transition">Send Bill</button>
-                            <button onClick={() => setCreatingInvoiceFor(null)} className="text-slate-400 hover:text-white px-2 py-2 text-sm">Cancel</button>
+                      {creatingInvoiceFor === selectedDealer.id ? (
+                        <div className="flex flex-col sm:flex-row gap-3 items-center bg-slate-950 p-4 rounded-lg border border-slate-800">
+                          <input type="text" placeholder="Desc (e.g. 3 cars)" value={newInvoiceDesc} onChange={(e) => setNewInvoiceDesc(e.target.value)} className="bg-slate-900 border border-slate-700 text-white px-4 py-2 rounded-lg w-full sm:w-auto flex-1 focus:ring-2 focus:ring-amber-500 outline-none" />
+                          <input type="number" placeholder="$ Amount" value={newInvoiceAmount} onChange={(e) => setNewInvoiceAmount(e.target.value)} className="bg-slate-900 border border-slate-700 text-white px-4 py-2 rounded-lg w-full sm:w-32 focus:ring-2 focus:ring-amber-500 outline-none" />
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <button onClick={() => handleCreateInvoice(selectedDealer)} className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold transition flex-1 sm:flex-none">Send Bill</button>
+                            <button onClick={() => setCreatingInvoiceFor(null)} className="text-slate-400 hover:text-white px-4 py-2">Cancel</button>
                           </div>
-                        ) : (
-                          <button onClick={() => setCreatingInvoiceFor(dealer.id)} className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center">
-                            <DollarSign className="w-4 h-4 mr-2" /> Bill Dealership
-                          </button>
-                        )}
+                        </div>
+                      ) : (
+                        <button onClick={() => setCreatingInvoiceFor(selectedDealer.id)} className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-lg font-bold transition flex items-center">
+                          <DollarSign className="w-5 h-5 mr-2" /> Bill Dealership
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-4">Appointments</h3>
+                        <div className="space-y-3">
+                          {appointments.filter(a => a.dealerId === selectedDealer.id).length === 0 && <p className="text-slate-500 italic">No appointments.</p>}
+                          {appointments.filter(a => a.dealerId === selectedDealer.id).map(apt => (
+                            <div key={apt.id} className="bg-slate-900 border border-slate-800 p-4 rounded-lg">
+                              <p className="text-white font-bold">{apt.carsCount} Cars Planned</p>
+                              <p className="text-slate-400 text-sm mt-1">{apt.address}</p>
+                              <p className="text-slate-500 text-xs mt-2">{apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleDateString() : 'Just now'}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-4">Invoices</h3>
+                        <div className="space-y-3">
+                          {invoices.filter(i => i.dealerId === selectedDealer.id).length === 0 && <p className="text-slate-500 italic">No invoices.</p>}
+                          {invoices.filter(i => i.dealerId === selectedDealer.id).map(inv => (
+                            <div key={inv.id} className="bg-slate-900 border border-slate-800 p-4 rounded-lg flex justify-between items-center">
+                              <div>
+                                <p className="text-white font-bold">{inv.description}</p>
+                                <p className="text-slate-400 text-sm">${inv.amount.toFixed(2)}</p>
+                              </div>
+                              <span className={`text-xs font-bold px-2 py-1 rounded uppercase ${inv.status === 'paid' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-500'}`}>
+                                {inv.status}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <>
+                    <h1 className="text-3xl font-bold text-white mb-6">Registered Dealerships</h1>
+                    <div className="space-y-4">
+                      {dealers.map(dealer => (
+                        <div key={dealer.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col md:flex-row justify-between items-center">
+                          <div>
+                            <h3 className="text-xl font-bold text-white">{dealer.dealership || dealer.name}</h3>
+                            <p className="text-slate-400 text-sm">{dealer.email}</p>
+                          </div>
+                          
+                          <div className="mt-4 md:mt-0 flex gap-3">
+                            <button onClick={() => setSelectedDealer(dealer)} className="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2 rounded-lg text-sm font-bold transition">
+                              View Details
+                            </button>
+                            <button onClick={() => setCreatingInvoiceFor(dealer.id)} className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center">
+                              <DollarSign className="w-4 h-4 mr-2" /> Bill Dealership
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </>
             )}
 
