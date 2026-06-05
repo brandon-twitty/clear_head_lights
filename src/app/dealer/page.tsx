@@ -3,7 +3,7 @@
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Car, FileText, Calendar, LogOut, DollarSign, CheckCircle2 } from "lucide-react";
+import { Car, FileText, Calendar, LogOut, DollarSign, CheckCircle2, X } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
@@ -27,6 +27,7 @@ export default function DealerPortal() {
   const [activeTab, setActiveTab] = useState<"schedule" | "billing">("schedule");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [payingInvoiceId, setPayingInvoiceId] = useState<string | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -136,18 +137,16 @@ export default function DealerPortal() {
             </div>
 
             {activeTab === 'schedule' && (
-              <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden h-[700px] relative">
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                  <p className="text-slate-500">Loading Calendar...</p>
-                </div>
-                <iframe 
-                  src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2wj_MPuipVnuRsVgwyMSv5jPZfVrekqICPJyiapzz3w5336ykdtJElsKavW9bZUm1ou79Fkqv7?gv=true" 
-                  style={{ border: 0 }} 
-                  width="100%" 
-                  height="100%" 
-                  className="absolute inset-0 z-10 bg-white"
-                  title="Schedule Service"
-                ></iframe>
+              <div className="bg-slate-900 rounded-xl border border-slate-800 p-8 text-center h-[400px] flex flex-col items-center justify-center">
+                <Calendar className="w-16 h-16 text-amber-500 mb-6" />
+                <h2 className="text-2xl font-bold text-white mb-2">Schedule an On-Lot Visit</h2>
+                <p className="text-slate-400 mb-8 max-w-md">Book a time for our mobile technicians to come to your dealership and restore your inventory.</p>
+                <button 
+                  onClick={() => setShowScheduleModal(true)}
+                  className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-lg px-8 py-4 rounded-xl transition shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                >
+                  Schedule Visit
+                </button>
               </div>
             )}
 
@@ -191,6 +190,39 @@ export default function DealerPortal() {
           </div>
         </main>
       </div>
+
+      {/* Schedule Modal */}
+      {showScheduleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden relative shadow-2xl">
+            <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-950/50">
+              <h3 className="text-xl font-bold text-white flex items-center">
+                <Calendar className="w-5 h-5 mr-2 text-amber-500" />
+                Schedule Your Service
+              </h3>
+              <button 
+                onClick={() => setShowScheduleModal(false)}
+                className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-full transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 relative bg-white">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                <p className="text-slate-500">Loading Calendar...</p>
+              </div>
+              <iframe 
+                src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2wj_MPuipVnuRsVgwyMSv5jPZfVrekqICPJyiapzz3w5336ykdtJElsKavW9bZUm1ou79Fkqv7?gv=true" 
+                style={{ border: 0 }} 
+                width="100%" 
+                height="100%" 
+                className="absolute inset-0 z-10"
+                title="Schedule Service"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -140,8 +140,8 @@ export default function PartnershipIntake() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-1">Est. Vehicles Needing Restoration</label>
-            <select name="inventorySize" value={formData.inventorySize} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition appearance-none cursor-pointer">
+            <label className="block text-sm font-bold text-slate-300 mb-1">Est. Vehicles Needing Restoration *</label>
+            <select required name="inventorySize" value={formData.inventorySize} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition appearance-none cursor-pointer">
               <option value="" disabled>Select quantity...</option>
               <option value="1-5">1 - 5 Vehicles</option>
               <option value="5-15">5 - 15 Vehicles</option>
@@ -151,8 +151,8 @@ export default function PartnershipIntake() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-1">Additional Notes (Optional)</label>
-            <textarea name="notes" value={formData.notes} onChange={handleChange} rows={3} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition resize-none" placeholder="Best time to call, specific inventory needs, etc." />
+            <label className="block text-sm font-bold text-slate-300 mb-1">Additional Notes *</label>
+            <textarea required name="notes" value={formData.notes} onChange={handleChange} rows={3} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition resize-none" placeholder="Best time to call, specific inventory needs, etc." />
           </div>
 
           <button type="submit" disabled={loading} className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-4 rounded-xl transition mt-6 flex justify-center items-center shadow-[0_0_15px_rgba(245,158,11,0.2)] disabled:opacity-50 text-lg">
