@@ -347,31 +347,39 @@ export default function AdminPortal() {
                         <h3 className="text-xl font-bold text-white mb-4">Appointments</h3>
                         <div className="space-y-3">
                           {appointments.filter(a => a.dealerId === selectedDealer.id).length === 0 && <p className="text-slate-500 italic">No appointments.</p>}
-                          {appointments.filter(a => a.dealerId === selectedDealer.id).map(apt => (
-                            <div key={apt.id} className="bg-slate-900 border border-slate-800 p-5 rounded-xl hover:border-amber-500/50 transition-colors group flex flex-col justify-between">
-                              <div>
-                                <div className="flex justify-between items-start mb-2">
-                                  <p className="text-white font-bold text-lg flex items-center">
-                                    <Calendar className="w-4 h-4 mr-2 text-amber-500" />
-                                    {apt.carsCount} Cars Planned
-                                  </p>
-                                  <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                    Pending
-                                  </span>
+                          {appointments.filter(a => a.dealerId === selectedDealer.id).map(apt => {
+                            const PRICE_PER_CAR = 75; // Adjust this value as needed
+                            const estimatedTotal = apt.carsCount * PRICE_PER_CAR;
+                            
+                            return (
+                              <div key={apt.id} className="bg-slate-900 border border-slate-800 p-5 rounded-xl hover:border-amber-500/50 transition-colors group flex flex-col justify-between">
+                                <div>
+                                  <div className="flex justify-between items-start mb-2">
+                                    <p className="text-white font-bold text-lg flex items-center">
+                                      <Calendar className="w-4 h-4 mr-2 text-amber-500" />
+                                      {apt.carsCount} Cars Planned
+                                    </p>
+                                    <div className="flex flex-col items-end">
+                                      <span className="text-emerald-400 font-bold mb-1">Est. ${estimatedTotal}</span>
+                                      <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                                        Pending
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <p className="text-slate-400 text-sm">{apt.address}</p>
+                                  <p className="text-slate-500 text-xs mt-3">Submitted {apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleDateString() : 'Just now'}</p>
                                 </div>
-                                <p className="text-slate-400 text-sm">{apt.address}</p>
-                                <p className="text-slate-500 text-xs mt-3">Submitted {apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleDateString() : 'Just now'}</p>
+                                <a 
+                                  href="https://calendar.google.com/calendar/u/0/r" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="mt-4 w-full bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center"
+                                >
+                                  View in Google Calendar <ExternalLink className="w-3 h-3 ml-2" />
+                                </a>
                               </div>
-                              <a 
-                                href="https://calendar.google.com/calendar/u/0/r" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="mt-4 w-full bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center"
-                              >
-                                View in Google Calendar <ExternalLink className="w-3 h-3 ml-2" />
-                              </a>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                       <div>
@@ -473,27 +481,41 @@ export default function AdminPortal() {
               <>
                 <h1 className="text-3xl font-bold text-white mb-6">Service Appointments</h1>
                 <div className="space-y-4">
-                  {appointments.map(apt => (
-                    <div key={apt.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center">
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{apt.dealershipName}</h3>
-                        <p className="text-slate-400 mt-1 flex items-center">
-                          <span className="font-bold text-slate-300 mr-2">Address:</span> {apt.address}
-                        </p>
-                        <p className="text-slate-400 mt-1 flex items-center">
-                          <span className="font-bold text-slate-300 mr-2">Planned Cars:</span> <span className="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-sm font-bold">{apt.carsCount}</span>
-                        </p>
-                        <p className="text-slate-500 text-xs mt-2">
-                          Submitted: {apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleString() : 'Just now'}
-                        </p>
+                  {appointments.map(apt => {
+                    const PRICE_PER_CAR = 75; // Adjust this value as needed
+                    const estimatedTotal = apt.carsCount * PRICE_PER_CAR;
+                    
+                    return (
+                      <div key={apt.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div>
+                          <h3 className="text-xl font-bold text-white">{apt.dealershipName}</h3>
+                          <p className="text-slate-400 mt-1 flex items-center">
+                            <span className="font-bold text-slate-300 mr-2">Address:</span> {apt.address}
+                          </p>
+                          <p className="text-slate-400 mt-1 flex items-center">
+                            <span className="font-bold text-slate-300 mr-2">Planned Cars:</span> <span className="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-sm font-bold">{apt.carsCount}</span>
+                            <span className="ml-3 text-emerald-400 font-bold text-sm">(Est. ${estimatedTotal})</span>
+                          </p>
+                          <p className="text-slate-500 text-xs mt-2">
+                            Submitted: {apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleString() : 'Just now'}
+                          </p>
+                        </div>
+                        <div className="mt-4 md:mt-0 flex flex-col items-end">
+                          <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
+                            Pending Schedule
+                          </span>
+                          <a 
+                            href="https://calendar.google.com/calendar/u/0/r" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 px-3 py-1.5 rounded text-xs font-medium transition flex items-center"
+                          >
+                            Google Calendar <ExternalLink className="w-3 h-3 ml-1" />
+                          </a>
+                        </div>
                       </div>
-                      <div className="mt-4 md:mt-0">
-                        <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                          Pending Schedule
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {appointments.length === 0 && (
                     <div className="text-slate-500 text-center py-12 border-2 border-dashed border-slate-800 rounded-xl">
                       No appointments found.
