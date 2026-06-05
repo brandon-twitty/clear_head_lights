@@ -12,6 +12,7 @@ export default function PartnershipIntake() {
     dealership: "",
     email: "",
     phone: "",
+    address: "",
     inventorySize: "",
     notes: "",
   });
@@ -137,6 +138,11 @@ export default function PartnershipIntake() {
               <label className="block text-sm font-bold text-slate-300 mb-1">Phone Number *</label>
               <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition" placeholder="(314) 555-0123" />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-300 mb-1">Dealership Address *</label>
+            <input required type="text" name="address" value={formData.address} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 transition" placeholder="123 Main St, City, State, ZIP" />
           </div>
 
           <div>
