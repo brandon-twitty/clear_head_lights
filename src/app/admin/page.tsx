@@ -31,6 +31,7 @@ interface UserDoc {
   dealership: string;
   email: string;
   role: string;
+  createdAt?: any;
 }
 
 interface Invoice {
