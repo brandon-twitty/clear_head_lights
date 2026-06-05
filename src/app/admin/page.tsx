@@ -3,7 +3,7 @@
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Users, FileText, Calendar, LogOut, BarChart, Phone, Mail, Link as LinkIcon, CheckCircle2, DollarSign, Send, Trash2 } from "lucide-react";
+import { Users, FileText, Calendar, LogOut, BarChart, Phone, Mail, Link as LinkIcon, CheckCircle2, DollarSign, Send, Trash2, ExternalLink } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
@@ -348,10 +348,28 @@ export default function AdminPortal() {
                         <div className="space-y-3">
                           {appointments.filter(a => a.dealerId === selectedDealer.id).length === 0 && <p className="text-slate-500 italic">No appointments.</p>}
                           {appointments.filter(a => a.dealerId === selectedDealer.id).map(apt => (
-                            <div key={apt.id} className="bg-slate-900 border border-slate-800 p-4 rounded-lg">
-                              <p className="text-white font-bold">{apt.carsCount} Cars Planned</p>
-                              <p className="text-slate-400 text-sm mt-1">{apt.address}</p>
-                              <p className="text-slate-500 text-xs mt-2">{apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleDateString() : 'Just now'}</p>
+                            <div key={apt.id} className="bg-slate-900 border border-slate-800 p-5 rounded-xl hover:border-amber-500/50 transition-colors group flex flex-col justify-between">
+                              <div>
+                                <div className="flex justify-between items-start mb-2">
+                                  <p className="text-white font-bold text-lg flex items-center">
+                                    <Calendar className="w-4 h-4 mr-2 text-amber-500" />
+                                    {apt.carsCount} Cars Planned
+                                  </p>
+                                  <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                                    Pending
+                                  </span>
+                                </div>
+                                <p className="text-slate-400 text-sm">{apt.address}</p>
+                                <p className="text-slate-500 text-xs mt-3">Submitted {apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleDateString() : 'Just now'}</p>
+                              </div>
+                              <a 
+                                href="https://calendar.google.com/calendar/u/0/r" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="mt-4 w-full bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center"
+                              >
+                                View in Google Calendar <ExternalLink className="w-3 h-3 ml-2" />
+                              </a>
                             </div>
                           ))}
                         </div>
