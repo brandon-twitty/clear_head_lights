@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Car, FileText, Calendar, LogOut, DollarSign, CheckCircle2, X } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, where, orderBy, onSnapshot, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
 import { createCheckoutSession } from "@/actions/stripe";
 
@@ -28,6 +28,10 @@ export default function DealerPortal() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [payingInvoiceId, setPayingInvoiceId] = useState<string | null>(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleStep, setScheduleStep] = useState<"form" | "calendar">("form");
+  const [serviceAddress, setServiceAddress] = useState("");
+  const [carsCount, setCarsCount] = useState("");
+  const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -37,6 +41,15 @@ export default function DealerPortal() {
 
   useEffect(() => {
     if (user) {
+      getDoc(doc(db, "users", user.uid)).then(d => {
+        if (d.exists()) {
+          setUserData(d.data());
+          if (d.data().address) {
+            setServiceAddress(d.data().address);
+          }
+        }
+      });
+
       const q = query(
         collection(db, "invoices"), 
         where("dealerId", "==", user.uid),
@@ -201,25 +214,83 @@ export default function DealerPortal() {
                 Schedule Your Service
               </h3>
               <button 
-                onClick={() => setShowScheduleModal(false)}
+                onClick={() => {
+                  setShowScheduleModal(false);
+                  setScheduleStep("form");
+                }}
                 className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-full transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex-1 relative bg-white">
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                <p className="text-slate-500">Loading Calendar...</p>
+            
+            {scheduleStep === "form" ? (
+              <div className="flex-1 p-8 flex flex-col items-center justify-center bg-slate-900">
+                <div className="w-full max-w-md bg-slate-950 p-8 rounded-2xl border border-slate-800 shadow-xl">
+                  <h4 className="text-2xl font-bold text-white mb-2">Service Details</h4>
+                  <p className="text-slate-400 text-sm mb-6">Let us know where we're going and how many cars to expect.</p>
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-1">Service Address</label>
+                      <input 
+                        type="text" 
+                        value={serviceAddress}
+                        onChange={(e) => setServiceAddress(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-500 outline-none transition" 
+                        placeholder="123 Main St..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-1">Number of Cars Planned</label>
+                      <input 
+                        type="number" 
+                        min="1"
+                        value={carsCount}
+                        onChange={(e) => setCarsCount(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-500 outline-none transition" 
+                        placeholder="e.g. 5"
+                      />
+                    </div>
+                    <button 
+                      onClick={async () => {
+                        if (!serviceAddress || !carsCount) return alert("Please fill out all fields");
+                        try {
+                          await addDoc(collection(db, "appointments"), {
+                            dealerId: user.uid,
+                            dealershipName: userData?.dealership || user.email,
+                            address: serviceAddress,
+                            carsCount: Number(carsCount),
+                            status: "pending",
+                            createdAt: serverTimestamp()
+                          });
+                          setScheduleStep("calendar");
+                        } catch (err) {
+                          console.error(err);
+                          alert("Failed to save details");
+                        }
+                      }}
+                      className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-4 rounded-xl transition shadow-[0_0_15px_rgba(245,158,11,0.2)] mt-2"
+                    >
+                      Proceed to Choose Time &rarr;
+                    </button>
+                  </div>
+                </div>
               </div>
-              <iframe 
-                src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2wj_MPuipVnuRsVgwyMSv5jPZfVrekqICPJyiapzz3w5336ykdtJElsKavW9bZUm1ou79Fkqv7?gv=true" 
-                style={{ border: 0 }} 
-                width="100%" 
-                height="100%" 
-                className="absolute inset-0 z-10"
-                title="Schedule Service"
-              ></iframe>
-            </div>
+            ) : (
+              <div className="flex-1 relative bg-white">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                  <p className="text-slate-500">Loading Calendar...</p>
+                </div>
+                <iframe 
+                  src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2wj_MPuipVnuRsVgwyMSv5jPZfVrekqICPJyiapzz3w5336ykdtJElsKavW9bZUm1ou79Fkqv7?gv=true" 
+                  style={{ border: 0 }} 
+                  width="100%" 
+                  height="100%" 
+                  className="absolute inset-0 z-10"
+                  title="Schedule Service"
+                ></iframe>
+              </div>
+            )}
           </div>
         </div>
       )}

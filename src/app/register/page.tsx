@@ -72,6 +72,7 @@ function RegisterContent() {
         email: invite.email,
         name: invite.name,
         dealership: invite.dealership,
+        address: invite.address || "",
         role: "dealer",
         createdAt: new Date().toISOString()
       });
