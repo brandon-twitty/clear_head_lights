@@ -6,10 +6,11 @@ import { useEffect, useState } from "react";
 import { Users, FileText, Calendar, LogOut, BarChart, Phone, Mail, Link as LinkIcon, CheckCircle2, DollarSign, Send, Trash2, ExternalLink } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, where, getDocs, writeBatch } from "firebase/firestore";
 import Link from "next/link";
 import { sendInviteEmail } from "@/actions/sendEmail";
 import { sendInvoiceReminder } from "@/actions/sendReminder";
+import { deleteDealer } from "@/actions/deleteDealer";
 
 interface Lead {
   id: string;
@@ -174,12 +175,32 @@ export default function AdminPortal() {
   };
 
   const handleDeleteLead = async (leadId: string) => {
-    if (confirm("Are you sure you want to delete this lead?")) {
+    if (confirm("Are you sure you want to delete this lead? This will also revoke any active invites.")) {
       try {
-        await deleteDoc(doc(db, "leads", leadId));
+        const q = query(collection(db, "invites"), where("leadId", "==", leadId));
+        const inviteDocs = await getDocs(q);
+        const batch = writeBatch(db);
+        inviteDocs.forEach(d => {
+          batch.delete(doc(db, "invites", d.id));
+        });
+        batch.delete(doc(db, "leads", leadId));
+        await batch.commit();
       } catch (err) {
         console.error("Error deleting lead:", err);
         alert("Failed to delete lead.");
+      }
+    }
+  };
+
+  const handleDeleteDealership = async (dealerId: string) => {
+    if (confirm("Are you sure you want to completely delete this dealership? This action cannot be undone and they will lose all access.")) {
+      try {
+        const result = await deleteDealer(dealerId);
+        if (!result.success) throw new Error(result.error);
+        alert("Dealership deleted.");
+      } catch (err: any) {
+        console.error("Error deleting dealership:", err);
+        alert(err.message || "Failed to delete dealership.");
       }
     }
   };
@@ -426,6 +447,9 @@ export default function AdminPortal() {
                             </button>
                             <button onClick={() => setCreatingInvoiceFor(dealer.id)} className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center">
                               <DollarSign className="w-4 h-4 mr-2" /> Bill Dealership
+                            </button>
+                            <button onClick={() => handleDeleteDealership(dealer.id)} className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 p-2 rounded-lg transition" title="Delete Dealership">
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
