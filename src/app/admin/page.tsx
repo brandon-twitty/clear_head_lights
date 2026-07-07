@@ -132,12 +132,20 @@ export default function AdminPortal() {
       await updateDoc(doc(db, "leads", lead.id), { status: "contacted", invitedAt: serverTimestamp() });
 
       const inviteLink = `${appUrl}/register?token=${token}`;
-      await navigator.clipboard.writeText(inviteLink);
-      setCopiedToken(lead.id);
-      setTimeout(() => setCopiedToken(null), 3000);
-    } catch (error) {
+      try {
+        await navigator.clipboard.writeText(inviteLink);
+        setCopiedToken(lead.id);
+        setTimeout(() => setCopiedToken(null), 3000);
+      } catch (clipErr) {
+        console.warn("Clipboard access denied/failed", clipErr);
+        // Still show success since it generated
+        setCopiedToken(lead.id);
+        setTimeout(() => setCopiedToken(null), 3000);
+        alert(`Invite generated successfully!\nLink: ${inviteLink}`);
+      }
+    } catch (error: any) {
       console.error("Error generating invite:", error);
-      alert("Failed to generate invite. Check console.");
+      alert("Failed to generate invite: " + (error?.message || "Unknown error"));
     } finally {
       setProcessingId(null);
     }
