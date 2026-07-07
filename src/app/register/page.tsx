@@ -6,7 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { activateDealer } from "@/actions/activateDealer";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Shield, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
+import { Shield, Loader2, Sparkles, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
 function RegisterContent() {
@@ -20,6 +20,8 @@ function RegisterContent() {
   const [error, setError] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     const fetchInvite = async () => {
@@ -146,9 +148,9 @@ function RegisterContent() {
             
             <div>
               <label className="block text-sm font-medium text-slate-300">Set Password</label>
-              <div className="mt-1">
+              <div className="relative mt-1">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   minLength={6}
                   value={password}
@@ -156,14 +158,21 @@ function RegisterContent() {
                   className="block w-full appearance-none rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 sm:text-sm transition"
                   placeholder="At least 6 characters"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-300">Confirm Password</label>
-              <div className="mt-1">
+              <div className="relative mt-1">
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   required
                   minLength={6}
                   value={confirmPassword}
@@ -171,6 +180,13 @@ function RegisterContent() {
                   className="block w-full appearance-none rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500 sm:text-sm transition"
                   placeholder="Repeat your password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 
