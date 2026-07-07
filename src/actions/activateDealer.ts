@@ -50,10 +50,7 @@ export async function activateDealer(token: string, password: string) {
     // 5. Delete the one-time invite token
     await inviteRef.delete();
 
-    // 6. Generate custom token for client sign-in
-    const customToken = await adminAuth.createCustomToken(uid);
-
-    return { success: true, customToken };
+    return { success: true, email: invite.email };
 
   } catch (err: any) {
     console.error("activateDealer error:", err);
