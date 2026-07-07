@@ -20,12 +20,23 @@ interface Invoice {
   createdAt: any;
 }
 
+interface Appointment {
+  id: string;
+  dealerId: string;
+  dealershipName: string;
+  address: string;
+  carsCount: number;
+  status: string;
+  createdAt: any;
+}
+
 export default function DealerPortal() {
   const { user, role, loading } = useAuth();
   const router = useRouter();
   
-  const [activeTab, setActiveTab] = useState<"schedule" | "billing">("schedule");
+  const [activeTab, setActiveTab] = useState<"schedule" | "billing" | "appointments">("schedule");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [payingInvoiceId, setPayingInvoiceId] = useState<string | null>(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [scheduleStep, setScheduleStep] = useState<"form" | "calendar">("form");
@@ -56,10 +67,24 @@ export default function DealerPortal() {
         orderBy("createdAt", "desc")
       );
       
-      const unsubscribe = onSnapshot(q, (snapshot) => {
+      const unsubscribeInvoices = onSnapshot(q, (snapshot) => {
         setInvoices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Invoice[]);
       });
-      return () => unsubscribe();
+
+      const appointmentsQuery = query(
+        collection(db, "appointments"),
+        where("dealerId", "==", user.uid),
+        orderBy("createdAt", "desc")
+      );
+
+      const unsubscribeAppointments = onSnapshot(appointmentsQuery, (snapshot) => {
+        setAppointments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Appointment[]);
+      });
+
+      return () => {
+        unsubscribeInvoices();
+        unsubscribeAppointments();
+      };
     }
   }, [user]);
 
@@ -127,6 +152,17 @@ export default function DealerPortal() {
                 </span>
               )}
             </button>
+            {appointments.length > 0 && (
+              <button 
+                onClick={() => setActiveTab("appointments")}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg font-medium transition ${activeTab === 'appointments' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+              >
+                <div className="flex items-center"><Calendar className="w-5 h-5 mr-3" /> Appointments</div>
+                <span className="bg-slate-800 text-slate-300 text-xs px-2 py-0.5 rounded-full font-bold">
+                  {appointments.length}
+                </span>
+              </button>
+            )}
           </nav>
         </aside>
 
@@ -200,6 +236,34 @@ export default function DealerPortal() {
               </div>
             )}
 
+            {activeTab === 'appointments' && (
+              <div className="bg-slate-900 rounded-xl border border-slate-800 p-6">
+                <h2 className="text-xl font-bold text-white mb-6">Your Appointments</h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {appointments.map(apt => (
+                    <div key={apt.id} className="bg-slate-950 border border-slate-800 rounded-lg p-5 flex flex-col justify-between hover:border-amber-500/30 transition group">
+                      <div>
+                        <div className="flex justify-between items-start mb-2">
+                          <p className="text-white font-bold text-lg flex items-center">
+                            <Car className="w-5 h-5 mr-2 text-amber-500" />
+                            {apt.carsCount} Cars Planned
+                          </p>
+                          <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                            Pending
+                          </span>
+                        </div>
+                        <p className="text-slate-400 text-sm mb-4">{apt.address}</p>
+                      </div>
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800">
+                        <span className="text-slate-500 text-xs">
+                          Submitted {apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleDateString() : 'Just now'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
