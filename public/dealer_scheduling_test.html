@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 20px; }
+h1, h2, h3 { color: #333; }
+hr { border: 0; border-top: 1px solid #ccc; margin: 20px 0; }
+</style>
+</head>
+<body>
+<h1>🧪 Tester Guide: Dealership Portal & Scheduling</h1>
+<p>Welcome to the <strong>Kelley's Clear Headlights</strong> testing team!<br>
+Your goal is to test the end-to-end flow of becoming a partnered Dealership and scheduling a mobile headlight restoration service.</p>
+<p>Please follow these exact steps and report any bugs, layout issues, or confusion you experience along the way.</p>
+<hr>
+<h2>🏎️ Phase 1: Sign Up & Registration</h2>
+<h3>Step 1: Submit a Lead (As a Dealership)</h3>
+<ol>
+<li>Go to the public homepage and navigate to the Partnership Intake Form (<code>/partnership</code>).</li>
+<li>Fill out the lead form with a test Dealership Name, Email, and Phone Number.</li>
+<li>Click <strong>Submit Request</strong>.</li>
+</ol>
+<h3>Step 2: Generate Invite (As Admin)</h3>
+<p><em>This step must be done by the System Administrator.</em></p>
+<ol>
+<li>The Admin logs into the <code>/admin</code> portal.</li>
+<li>Under <strong>Dashboard</strong> -&gt; <strong>Recent Leads</strong>, locate the newly submitted test lead.</li>
+<li>Click the <strong>Gen Invite & Email</strong> button.</li>
+<li>The system will instantly copy the secure invite link to the Admin's clipboard and send an email to the lead.</li>
+<li>The Admin sends this secure Invite Link to the Tester.</li>
+</ol>
+<h3>Step 3: Register the Account</h3>
+<ol>
+<li>Open the <strong>Invite Link</strong> provided by the Admin.</li>
+<li>You will be taken to a secure registration form (<code>/register?token=...</code>).</li>
+<li>Set your <strong>Password</strong>, confirm it, and you can use the new Eye Icon to verify what you typed!</li>
+<li>Click the <strong>Complete Registration</strong> button.</li>
+<li>The system will activate your account and instantly log you into the <strong>Dealer Portal</strong> (<code>/dealer</code>).</li>
+</ol>
+<hr>
+<h2>📅 Phase 2: Dealer Portal & Scheduling</h2>
+<h3>Step 4: Explore the Portal</h3>
+<ol>
+<li>Look at your main dashboard. You should see an <strong>Outstanding Balance</strong> module and other metrics.</li>
+<li>Notice the navigation tabs on the left side of the screen.</li>
+</ol>
+<h3>Step 5: Schedule an Appointment</h3>
+<ol>
+<li>Make sure you are on the <strong>Schedule Service</strong> tab.</li>
+<li>Fill out the "Service Details" form (Service Address and Number of Cars Planned).</li>
+<li>Click <strong>Proceed to Choose Time</strong>.</li>
+<li>You will see a calendar interface. <strong>Select an available date and time slot.</strong></li>
+<li>Confirm the booking on the calendar.</li>
+<li>Look at your left navigation menu: a new <strong>"Appointments"</strong> tab should now appear! Click it to verify your appointment was saved successfully.</li>
+</ol>
+<hr>
+<h2>🧹 Phase 3: Admin Reset (Clearing Data to Restart)</h2>
+<p>If a tester makes a mistake or you need to run the test again from scratch, the Admin can wipe the data cleanly from the Admin Portal:</p>
+<ol>
+<li><strong>Delete the Dealership Account:</strong>
+<ul>
+<li>Go to the <strong>Dealerships</strong> tab in the <code>/admin</code> dashboard.</li>
+<li>Find the test dealership.</li>
+<li>Click the red <strong>Trash icon (Delete Dealership)</strong>. This completely wipes them from the database and revokes their login access permanently.</li>
+</ul>
+</li>
+<li><strong>Delete the Lead & Invite:</strong>
+<ul>
+<li>Go back to the <strong>Dashboard</strong> tab.</li>
+<li>Under <strong>Recent Leads</strong>, find the original test lead.</li>
+<li>Click the red <strong>Trash icon (Delete Lead)</strong>. This deletes the lead record and safely destroys any unused invite links associated with it.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3>🛑 What to look out for:</h3>
+<ul>
+<li>Did the page load slowly or look weird on your mobile phone?</li>
+<li>Did the calendar fit nicely inside the screen without clipping?</li>
+<li>Did the "Appointments" tab show up immediately after scheduling?</li>
+<li>Were there any confusing steps or dead ends?</li>
+</ul>
+<p><em>Thank you for testing! Please compile any feedback and send it to the development team.</em></p>
+</body>
+</html>
