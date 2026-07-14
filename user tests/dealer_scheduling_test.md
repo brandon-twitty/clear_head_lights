@@ -10,13 +10,15 @@ Please follow these exact steps and report any bugs, layout issues, or confusion
 ## 🏎️ Phase 1: Sign Up & Registration
 
 ### Step 1: Submit a Lead (As a Dealership)
-1. Go to the public homepage and navigate to the Partnership Intake Form (`/partnership`).
-2. Fill out the lead form with a test Dealership Name, Email, and Phone Number.
-3. Click **Submit Request**.
+1. Go to the public homepage and navigate to the Partnership Intake Form (`https://stlclearheadlights.com/partnership`).
+2. Or Scan Barcode:
+   <img width="200px" src="./flyers/dealership-qrcode.png"/>
+3. Fill out the lead form with a test Dealership Name, Email, and Phone Number.
+4. Click **Submit Request**.
 
 ### Step 2: Generate Invite (As Admin)
 *This step must be done by the System Administrator.*
-1. The Admin logs into the `/admin` portal.
+1. The Admin logs into the `https://stlclearheadlights.com/admin` portal.
 2. Under **Dashboard** -> **Recent Leads**, locate the newly submitted test lead.
 3. Click the **Gen Invite & Email** button. 
 4. The system will instantly copy the secure invite link to the Admin's clipboard and send an email to the lead.
@@ -27,7 +29,7 @@ Please follow these exact steps and report any bugs, layout issues, or confusion
 2. You will be taken to a secure registration form (`/register?token=...`).
 3. Set your **Password**, confirm it, and you can use the new Eye Icon to verify what you typed!
 4. Click the **Complete Registration** button.
-5. The system will activate your account and instantly log you into the **Dealer Portal** (`/dealer`).
+5. The system will activate your account and instantly log you into the **Dealer Portal** (`https://stlclearheadlights.com/dealer`).
 
 ---
 
@@ -42,10 +44,10 @@ Please follow these exact steps and report any bugs, layout issues, or confusion
 2. Fill out the "Service Details" form (Service Address and Number of Cars Planned).
 3. Click **Check Availability & Pay**.
 4. You will see a calendar interface with a **glass overlay** blocking clicks. Scroll through the calendar behind the glass to confirm a time is available.
-5. Click the **Pay Now & Unlock Booking** button.
-6. You will be taken to Stripe Checkout. (If this is a test environment, you can use `4242 4242 4242 4242` as a test credit card number, any future date, and any CVC).
-7. After payment, you will be automatically redirected back to the Dealership Portal.
-8. The glass overlay will now be removed. **Select an available date and time slot.**
+5. Click the **Proceed to Payment** button to initialize secure checkout.
+6. A credit card form will load directly inside the glass overlay. (If this is a test environment, you can use `4242 4242 4242 4242` as a test credit card number, any future date, and any CVC).
+7. Click the **Pay & Unlock Booking** button.
+8. Upon successful payment, the glass overlay will automatically disappear. **Now select an available date and time slot.**
 9. Confirm the booking on the calendar.
 10. Look at your left navigation menu: a new **"Appointments"** tab should now appear! Click it to verify your appointment was saved successfully.
 ---
@@ -55,7 +57,7 @@ Please follow these exact steps and report any bugs, layout issues, or confusion
 If a tester makes a mistake or you need to run the test again from scratch, the Admin can wipe the data cleanly from the Admin Portal:
 
 1. **Delete the Dealership Account:**
-   - Go to the **Dealerships** tab in the `/admin` dashboard.
+   - Go to the **Dealerships** tab in the `https://stlclearheadlights.com/admin` dashboard.
    - Find the test dealership.
    - Click the red **Trash icon (Delete Dealership)**. This completely wipes them from the database and revokes their login access permanently.
 2. **Delete the Lead & Invite:**

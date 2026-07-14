@@ -33,18 +33,18 @@ export async function POST(req: Request) {
 
     // Handle the event
     switch (event.type) {
-      case "checkout.session.completed":
-        const session = event.data.object as Stripe.Checkout.Session;
+      case "payment_intent.succeeded":
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
         
         // Retrieve the appointment ID we passed in metadata
-        const appointmentId = session.metadata?.appointmentId;
+        const appointmentId = paymentIntent.metadata?.appointmentId;
 
         if (appointmentId) {
           // Update the appointment in Firestore to 'paid'
           await adminDb.collection("appointments").doc(appointmentId).update({
             status: "paid",
             paidAt: new Date().toISOString(),
-            stripeSessionId: session.id,
+            stripePaymentIntentId: paymentIntent.id,
           });
           console.log(`Appointment ${appointmentId} marked as paid.`);
         }

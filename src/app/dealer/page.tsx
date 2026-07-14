@@ -8,7 +8,49 @@ import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
-import { createCheckoutSession } from "@/actions/stripe";
+import { createPaymentIntent } from "@/actions/stripe";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+
+function CheckoutForm({ amount, onComplete }: { amount: number, onComplete: () => void }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setLoading(true);
+    
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      redirect: 'if_required' 
+    });
+
+    if (error) {
+      setError(error.message || "Payment failed");
+      setLoading(false);
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      onComplete();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full text-left mt-4">
+      <PaymentElement options={{layout: 'tabs'}} />
+      {error && <div className="text-red-400 text-sm mt-3 font-bold bg-red-500/10 p-2 rounded border border-red-500/20">{error}</div>}
+      <button 
+        disabled={!stripe || loading}
+        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3 rounded-xl transition shadow-lg disabled:opacity-50 mt-6 flex items-center justify-center"
+      >
+        {loading ? 'Processing...' : `Pay $${(amount / 100).toFixed(2)} & Unlock Booking`}
+      </button>
+    </form>
+  );
+}
 
 interface Invoice {
   id: string;
@@ -45,6 +87,7 @@ function DealerPortalContent() {
   const [userData, setUserData] = useState<any>(null);
   const [paymentStatus, setPaymentStatus] = useState<"pending" | "paid">("pending");
   const [pendingAppointmentId, setPendingAppointmentId] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -118,18 +161,18 @@ function DealerPortalContent() {
 
   const handlePayToUnlock = async () => {
     if (!pendingAppointmentId || !carsCount) return;
-    setPayingInvoiceId(pendingAppointmentId); // Reuse state for loading UI
+    setPayingInvoiceId(pendingAppointmentId);
     try {
-      const res = await createCheckoutSession(pendingAppointmentId, Number(carsCount), user?.email || "");
-      if (res.url) {
-        window.location.href = res.url;
+      const res = await createPaymentIntent(pendingAppointmentId, Number(carsCount), user?.email || "");
+      if (res.clientSecret) {
+        setClientSecret(res.clientSecret);
       } else {
         alert("Payment Error: " + res.error);
-        setPayingInvoiceId(null);
       }
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
+    } finally {
       setPayingInvoiceId(null);
     }
   };
@@ -385,13 +428,24 @@ function DealerPortalContent() {
                         </div>
                       </div>
 
-                      <button 
-                        onClick={handlePayToUnlock}
-                        disabled={payingInvoiceId === pendingAppointmentId}
-                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-4 rounded-xl transition shadow-lg disabled:opacity-50 flex items-center justify-center"
-                      >
-                        {payingInvoiceId === pendingAppointmentId ? 'Redirecting to Stripe...' : 'Pay Now & Unlock Booking'}
-                      </button>
+                      {clientSecret ? (
+                        <div className="w-full bg-slate-900 p-4 rounded-xl border border-slate-800 mt-4">
+                          <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
+                            <CheckoutForm 
+                              amount={Number(carsCount) * 4500} 
+                              onComplete={() => setPaymentStatus("paid")} 
+                            />
+                          </Elements>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={handlePayToUnlock}
+                          disabled={payingInvoiceId === pendingAppointmentId}
+                          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-4 rounded-xl transition shadow-lg disabled:opacity-50 flex items-center justify-center"
+                        >
+                          {payingInvoiceId === pendingAppointmentId ? 'Initializing Secure Checkout...' : 'Proceed to Payment'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
