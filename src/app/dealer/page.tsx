@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Car, FileText, Calendar, LogOut, DollarSign, CheckCircle2, X, Lock } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
@@ -30,7 +30,7 @@ interface Appointment {
   createdAt: any;
 }
 
-export default function DealerPortal() {
+function DealerPortalContent() {
   const { user, role, loading } = useAuth();
   const router = useRouter();
   
@@ -413,5 +413,13 @@ export default function DealerPortal() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DealerPortal() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 p-8 text-slate-400">Loading portal...</div>}>
+      <DealerPortalContent />
+    </Suspense>
   );
 }
