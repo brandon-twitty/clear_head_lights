@@ -45,12 +45,16 @@ Your goal is to test the end-to-end flow of becoming a partnered Dealership and 
 <li>Look at your main dashboard. You should see an <strong>Outstanding Balance</strong> module and other metrics.</li>
 <li>Notice the navigation tabs on the left side of the screen.</li>
 </ol>
-<h3>Step 5: Schedule an Appointment</h3>
+<h3>Step 5: Schedule an Appointment & Checkout</h3>
 <ol>
 <li>Make sure you are on the <strong>Schedule Service</strong> tab.</li>
 <li>Fill out the "Service Details" form (Service Address and Number of Cars Planned).</li>
-<li>Click <strong>Proceed to Choose Time</strong>.</li>
-<li>You will see a calendar interface. <strong>Select an available date and time slot.</strong></li>
+<li>Click <strong>Check Availability & Pay</strong>.</li>
+<li>You will see a calendar interface with a <strong>glass overlay</strong> blocking clicks. Scroll through the calendar behind the glass to confirm a time is available.</li>
+<li>Click the <strong>Pay Now & Unlock Booking</strong> button.</li>
+<li>You will be taken to Stripe Checkout. (If this is a test environment, you can use <code>4242 4242 4242 4242</code> as a test credit card number, any future date, and any CVC).</li>
+<li>After payment, you will be automatically redirected back to the Dealership Portal.</li>
+<li>The glass overlay will now be removed. <strong>Select an available date and time slot.</strong></li>
 <li>Confirm the booking on the calendar.</li>
 <li>Look at your left navigation menu: a new <strong>"Appointments"</strong> tab should now appear! Click it to verify your appointment was saved successfully.</li>
 </ol>

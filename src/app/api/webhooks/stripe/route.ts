@@ -36,17 +36,17 @@ export async function POST(req: Request) {
       case "checkout.session.completed":
         const session = event.data.object as Stripe.Checkout.Session;
         
-        // Retrieve the invoice ID we passed in metadata
-        const invoiceId = session.metadata?.invoiceId;
+        // Retrieve the appointment ID we passed in metadata
+        const appointmentId = session.metadata?.appointmentId;
 
-        if (invoiceId) {
-          // Update the invoice in Firestore to 'paid'
-          await adminDb.collection("invoices").doc(invoiceId).update({
+        if (appointmentId) {
+          // Update the appointment in Firestore to 'paid'
+          await adminDb.collection("appointments").doc(appointmentId).update({
             status: "paid",
-            paidAt: new Date(),
+            paidAt: new Date().toISOString(),
             stripeSessionId: session.id,
           });
-          console.log(`Invoice ${invoiceId} marked as paid.`);
+          console.log(`Appointment ${appointmentId} marked as paid.`);
         }
         break;
       default:

@@ -37,14 +37,17 @@ Please follow these exact steps and report any bugs, layout issues, or confusion
 1. Look at your main dashboard. You should see an **Outstanding Balance** module and other metrics.
 2. Notice the navigation tabs on the left side of the screen.
 
-### Step 5: Schedule an Appointment
+### Step 5: Schedule an Appointment & Checkout
 1. Make sure you are on the **Schedule Service** tab.
 2. Fill out the "Service Details" form (Service Address and Number of Cars Planned).
-3. Click **Proceed to Choose Time**.
-4. You will see a calendar interface. **Select an available date and time slot.**
-5. Confirm the booking on the calendar.
-6. Look at your left navigation menu: a new **"Appointments"** tab should now appear! Click it to verify your appointment was saved successfully.
-
+3. Click **Check Availability & Pay**.
+4. You will see a calendar interface with a **glass overlay** blocking clicks. Scroll through the calendar behind the glass to confirm a time is available.
+5. Click the **Pay Now & Unlock Booking** button.
+6. You will be taken to Stripe Checkout. (If this is a test environment, you can use `4242 4242 4242 4242` as a test credit card number, any future date, and any CVC).
+7. After payment, you will be automatically redirected back to the Dealership Portal.
+8. The glass overlay will now be removed. **Select an available date and time slot.**
+9. Confirm the booking on the calendar.
+10. Look at your left navigation menu: a new **"Appointments"** tab should now appear! Click it to verify your appointment was saved successfully.
 ---
 
 ## 🧹 Phase 3: Admin Reset (Clearing Data to Restart)

@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/lib/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Car, FileText, Calendar, LogOut, DollarSign, CheckCircle2, X } from "lucide-react";
+import { Car, FileText, Calendar, LogOut, DollarSign, CheckCircle2, X, Lock } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
@@ -43,6 +43,19 @@ export default function DealerPortal() {
   const [serviceAddress, setServiceAddress] = useState("");
   const [carsCount, setCarsCount] = useState("");
   const [userData, setUserData] = useState<any>(null);
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "paid">("pending");
+  const [pendingAppointmentId, setPendingAppointmentId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("payment") === "success") {
+      setShowScheduleModal(true);
+      setScheduleStep("calendar");
+      setPaymentStatus("paid");
+      // Clean up the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -93,17 +106,25 @@ export default function DealerPortal() {
   const handlePayNow = async (invoice: Invoice) => {
     setPayingInvoiceId(invoice.id);
     try {
-      const result = await createCheckoutSession(
-        invoice.id,
-        invoice.amount,
-        user?.email || "",
-        invoice.description
-      );
+      // NOTE: For standard invoices, we'd use a different action, but sticking to existing flow if needed
+      alert("Please use the scheduling flow for Stripe checkout.");
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    } finally {
+      setPayingInvoiceId(null);
+    }
+  };
 
-      if (result.url) {
-        window.location.href = result.url; // Redirect to Stripe
+  const handlePayToUnlock = async () => {
+    if (!pendingAppointmentId || !carsCount) return;
+    setPayingInvoiceId(pendingAppointmentId); // Reuse state for loading UI
+    try {
+      const res = await createCheckoutSession(pendingAppointmentId, Number(carsCount), user?.email || "");
+      if (res.url) {
+        window.location.href = res.url;
       } else {
-        alert("Payment Error: " + result.error);
+        alert("Payment Error: " + res.error);
         setPayingInvoiceId(null);
       }
     } catch (err) {
@@ -319,7 +340,7 @@ export default function DealerPortal() {
                       onClick={async () => {
                         if (!serviceAddress || !carsCount) return alert("Please fill out all fields");
                         try {
-                          await addDoc(collection(db, "appointments"), {
+                          const docRef = await addDoc(collection(db, "appointments"), {
                             dealerId: user.uid,
                             dealershipName: userData?.dealership || user.email,
                             address: serviceAddress,
@@ -327,6 +348,8 @@ export default function DealerPortal() {
                             status: "pending",
                             createdAt: serverTimestamp()
                           });
+                          setPendingAppointmentId(docRef.id);
+                          setPaymentStatus("pending");
                           setScheduleStep("calendar");
                         } catch (err) {
                           console.error(err);
@@ -335,13 +358,44 @@ export default function DealerPortal() {
                       }}
                       className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-4 rounded-xl transition shadow-[0_0_15px_rgba(245,158,11,0.2)] mt-2"
                     >
-                      Proceed to Choose Time &rarr;
+                      Check Availability & Pay &rarr;
                     </button>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="flex-1 relative bg-white">
+                {paymentStatus === "pending" && (
+                  <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[3px] z-20 flex flex-col items-center justify-center p-6">
+                    <div className="bg-slate-950 border border-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center pointer-events-auto">
+                      <Lock className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-bold text-white mb-2">Preview Available Times</h3>
+                      <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+                        Scroll behind this window to preview our current schedule and confirm a time works for you. <strong>Complete your payment to unlock the calendar and book your slot.</strong>
+                      </p>
+                      
+                      <div className="bg-slate-900 rounded-lg p-4 mb-6 border border-slate-800 text-left">
+                        <div className="flex justify-between items-center text-sm mb-3">
+                          <span className="text-slate-400 font-medium">Headlight Sets:</span>
+                          <span className="text-white font-bold bg-slate-800 px-3 py-1 rounded-md">{carsCount}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm border-t border-slate-800 pt-3">
+                          <span className="text-slate-400 font-medium">Total Price:</span>
+                          <span className="text-amber-400 font-black text-xl">${Number(carsCount) * 45}.00</span>
+                        </div>
+                      </div>
+
+                      <button 
+                        onClick={handlePayToUnlock}
+                        disabled={payingInvoiceId === pendingAppointmentId}
+                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-4 rounded-xl transition shadow-lg disabled:opacity-50 flex items-center justify-center"
+                      >
+                        {payingInvoiceId === pendingAppointmentId ? 'Redirecting to Stripe...' : 'Pay Now & Unlock Booking'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
                   <p className="text-slate-500">Loading Calendar...</p>
                 </div>
