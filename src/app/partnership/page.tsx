@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Shield, CheckCircle, Loader2, Sparkles, User, Building2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { sendInviteEmail } from "@/actions/sendEmail";
 
 export default function PartnershipIntake() {
   const router = useRouter();
@@ -29,11 +30,35 @@ export default function PartnershipIntake() {
     setError("");
 
     try {
-      await addDoc(collection(db, "leads"), {
+      // 1. Create Lead Document (marked as contacted since we are auto-inviting)
+      const leadRef = await addDoc(collection(db, "leads"), {
         ...formData,
         createdAt: serverTimestamp(),
-        status: "new"
+        invitedAt: serverTimestamp(),
+        status: "contacted"
       });
+
+      // 2. Generate Invite Token & Document
+      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      await setDoc(doc(db, "invites", token), {
+        email: formData.email,
+        dealership: formData.dealership,
+        name: formData.name,
+        address: formData.address || "",
+        leadId: leadRef.id,
+        createdAt: serverTimestamp()
+      });
+      
+      // 3. Send Invite Email
+      const appUrl = window.location.origin;
+      const emailResult = await sendInviteEmail(formData.email, formData.dealership, token, appUrl);
+
+      if (!emailResult.success) {
+        console.error("Email failed to send:", emailResult.error);
+        // We still show success to the user as the invite is created and lead is saved
+      }
+
       setSuccess(true);
     } catch (err: any) {
       console.error("Error submitting lead:", err);
@@ -54,7 +79,7 @@ export default function PartnershipIntake() {
           <CheckCircle className="w-20 h-20 text-amber-500 mx-auto mb-6 drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]" />
           <h2 className="text-3xl font-extrabold text-white mb-4">Request Received!</h2>
           <p className="text-slate-400 mb-8 leading-relaxed">
-            Thank you, {formData.name}. We've successfully received your partnership request for {formData.dealership}. Our team will contact you shortly to schedule your on-lot demonstration.
+            Thank you, {formData.name}. We've successfully received your partnership request for {formData.dealership}. <strong>An invite link has been sent to your email.</strong> Please check your inbox to activate your dealership portal.
           </p>
           <Link href="/" className="inline-block bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-lg font-bold transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">
             Return to Homepage
