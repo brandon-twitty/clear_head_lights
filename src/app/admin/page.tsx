@@ -541,7 +541,7 @@ export default function AdminPortal() {
                 <div className="space-y-4">
                   {appointments.filter(a => a.type !== 'individual').map(apt => {
                     const PRICE_PER_CAR = 75; // Adjust this value as needed
-                    const estimatedTotal = apt.carsCount * PRICE_PER_CAR;
+                    const estimatedTotal = (apt.carsCount || 0) * PRICE_PER_CAR;
                     
                     return (
                       <div key={apt.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center">
