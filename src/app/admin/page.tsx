@@ -211,6 +211,17 @@ export default function AdminPortal() {
     }
   };
 
+  const handleDeleteAppointment = async (aptId: string) => {
+    if (confirm("Are you sure you want to delete this appointment?")) {
+      try {
+        await deleteDoc(doc(db, "appointments", aptId));
+      } catch (err) {
+        console.error("Error deleting appointment:", err);
+        alert("Failed to delete appointment.");
+      }
+    }
+  };
+
   const handleSendReminder = async (invoice: Invoice) => {
     setRemindingInvoiceId(invoice.id);
     try {
@@ -583,7 +594,12 @@ export default function AdminPortal() {
                     return (
                       <div key={apt.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center">
                         <div>
-                          <h3 className="text-xl font-bold text-white">{apt.name}</h3>
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-bold text-white">{apt.name}</h3>
+                            <button onClick={() => handleDeleteAppointment(apt.id)} className="text-red-400 hover:text-red-300 transition p-1 md:hidden" title="Delete Booking">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                           <div className="flex items-center space-x-4 text-xs text-slate-500 mt-2 mb-2">
                             <a href={`tel:${apt.phone}`} className="flex items-center hover:text-amber-400 transition"><Phone className="w-3 h-3 mr-1" /> {apt.phone}</a>
                             <a href={`mailto:${apt.email}`} className="flex items-center hover:text-amber-400 transition"><Mail className="w-3 h-3 mr-1" /> {apt.email}</a>
@@ -600,9 +616,14 @@ export default function AdminPortal() {
                           </p>
                         </div>
                         <div className="mt-4 md:mt-0 flex flex-col items-end">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 ${apt.status === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
-                            {apt.status === 'paid' ? 'Paid & Unlocked' : 'Pending Payment'}
-                          </span>
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${apt.status === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                              {apt.status === 'paid' ? 'Paid & Unlocked' : 'Pending Payment'}
+                            </span>
+                            <button onClick={() => handleDeleteAppointment(apt.id)} className="text-red-400 hover:text-red-300 transition p-1 hidden md:block" title="Delete Booking">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                           <a 
                             href="https://calendar.google.com/calendar/u/0/r" 
                             target="_blank" 
