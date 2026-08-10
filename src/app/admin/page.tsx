@@ -3,7 +3,7 @@
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Users, FileText, Calendar, LogOut, BarChart, Phone, Mail, Link as LinkIcon, CheckCircle2, DollarSign, Send, Trash2, ExternalLink } from "lucide-react";
+import { Users, FileText, Calendar, LogOut, BarChart, Phone, Mail, Link as LinkIcon, CheckCircle2, DollarSign, Send, Trash2, ExternalLink, User } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp, updateDoc, addDoc, deleteDoc, where, getDocs, writeBatch } from "firebase/firestore";
@@ -48,18 +48,24 @@ interface Invoice {
 
 interface Appointment {
   id: string;
-  dealerId: string;
-  dealershipName: string;
+  dealerId?: string;
+  dealershipName?: string;
   address: string;
-  carsCount: number;
+  carsCount?: number;
   status: string;
   createdAt: any;
+  type?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  serviceType?: string;
+  paidAt?: string;
 }
 
 export default function AdminPortal() {
   const { user, role, loading } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "dealerships" | "invoices" | "appointments">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "dealerships" | "invoices" | "appointments" | "individuals">("dashboard");
   
   const [leads, setLeads] = useState<Lead[]>([]);
   const [dealers, setDealers] = useState<UserDoc[]>([]);
@@ -249,7 +255,10 @@ export default function AdminPortal() {
               <FileText className="w-5 h-5 mr-3" /> Invoices
             </button>
             <button onClick={() => { setActiveTab("appointments"); setSelectedDealer(null); }} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'appointments' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
-              <Calendar className="w-5 h-5 mr-3" /> Appointments
+              <Calendar className="w-5 h-5 mr-3" /> Dealer Appointments
+            </button>
+            <button onClick={() => { setActiveTab("individuals"); setSelectedDealer(null); }} className={`w-full flex items-center px-4 py-3 rounded-lg font-medium transition ${activeTab === 'individuals' ? 'bg-amber-500/10 text-amber-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+              <User className="w-5 h-5 mr-3" /> Individuals
             </button>
             
             <div className="pt-4 mt-4 border-t border-slate-800">
@@ -517,9 +526,9 @@ export default function AdminPortal() {
 
             {activeTab === 'appointments' && (
               <>
-                <h1 className="text-3xl font-bold text-white mb-6">Service Appointments</h1>
+                <h1 className="text-3xl font-bold text-white mb-6">Dealer Appointments</h1>
                 <div className="space-y-4">
-                  {appointments.map(apt => {
+                  {appointments.filter(a => a.type !== 'individual').map(apt => {
                     const PRICE_PER_CAR = 75; // Adjust this value as needed
                     const estimatedTotal = apt.carsCount * PRICE_PER_CAR;
                     
@@ -554,9 +563,61 @@ export default function AdminPortal() {
                       </div>
                     );
                   })}
-                  {appointments.length === 0 && (
+                  {appointments.filter(a => a.type !== 'individual').length === 0 && (
                     <div className="text-slate-500 text-center py-12 border-2 border-dashed border-slate-800 rounded-xl">
-                      No appointments found.
+                      No dealer appointments found.
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {activeTab === 'individuals' && (
+              <>
+                <h1 className="text-3xl font-bold text-white mb-6">Individual Bookings</h1>
+                <div className="space-y-4">
+                  {appointments.filter(a => a.type === 'individual').map(apt => {
+                    const price = apt.serviceType === 'standard' ? 45 : 35;
+                    const serviceLabel = apt.serviceType === 'standard' ? "Standard Set" : "Single Light";
+                    
+                    return (
+                      <div key={apt.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div>
+                          <h3 className="text-xl font-bold text-white">{apt.name}</h3>
+                          <div className="flex items-center space-x-4 text-xs text-slate-500 mt-2 mb-2">
+                            <a href={`tel:${apt.phone}`} className="flex items-center hover:text-amber-400 transition"><Phone className="w-3 h-3 mr-1" /> {apt.phone}</a>
+                            <a href={`mailto:${apt.email}`} className="flex items-center hover:text-amber-400 transition"><Mail className="w-3 h-3 mr-1" /> {apt.email}</a>
+                          </div>
+                          <p className="text-slate-400 mt-1 flex items-center">
+                            <span className="font-bold text-slate-300 mr-2">Address:</span> {apt.address}
+                          </p>
+                          <p className="text-slate-400 mt-1 flex items-center">
+                            <span className="font-bold text-slate-300 mr-2">Service:</span> <span className="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded text-sm font-bold">{serviceLabel}</span>
+                            <span className="ml-3 text-emerald-400 font-bold text-sm">${price}.00</span>
+                          </p>
+                          <p className="text-slate-500 text-xs mt-3">
+                            Submitted: {apt.createdAt ? new Date(apt.createdAt.toDate ? apt.createdAt.toDate() : apt.createdAt).toLocaleString() : 'Unknown'}
+                          </p>
+                        </div>
+                        <div className="mt-4 md:mt-0 flex flex-col items-end">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 ${apt.status === 'paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                            {apt.status === 'paid' ? 'Paid & Unlocked' : 'Pending Payment'}
+                          </span>
+                          <a 
+                            href="https://calendar.google.com/calendar/u/0/r" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 px-3 py-1.5 rounded text-xs font-medium transition flex items-center mt-1"
+                          >
+                            Google Calendar <ExternalLink className="w-3 h-3 ml-1" />
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {appointments.filter(a => a.type === 'individual').length === 0 && (
+                    <div className="text-slate-500 text-center py-12 border-2 border-dashed border-slate-800 rounded-xl">
+                      No individual bookings found.
                     </div>
                   )}
                 </div>
