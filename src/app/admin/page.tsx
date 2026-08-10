@@ -404,7 +404,7 @@ export default function AdminPortal() {
                           {appointments.filter(a => a.dealerId === selectedDealer.id).length === 0 && <p className="text-slate-500 italic">No appointments.</p>}
                           {appointments.filter(a => a.dealerId === selectedDealer.id).map(apt => {
                             const PRICE_PER_CAR = 75; // Adjust this value as needed
-                            const estimatedTotal = apt.carsCount * PRICE_PER_CAR;
+                            const estimatedTotal = (apt.carsCount || 0) * PRICE_PER_CAR;
                             
                             return (
                               <div key={apt.id} className="bg-slate-900 border border-slate-800 p-5 rounded-xl hover:border-amber-500/50 transition-colors group flex flex-col justify-between">
