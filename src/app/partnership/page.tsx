@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { collection, addDoc, serverTimestamp, setDoc, doc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { Shield, CheckCircle, Loader2, Sparkles, User, Building2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { sendInviteEmail } from "@/actions/sendEmail";
+import { submitDealerLead } from "@/actions/submitDealerLead";
 
 export default function PartnershipIntake() {
   const router = useRouter();
@@ -30,33 +28,11 @@ export default function PartnershipIntake() {
     setError("");
 
     try {
-      // 1. Create Lead Document (marked as contacted since we are auto-inviting)
-      const leadRef = await addDoc(collection(db, "leads"), {
-        ...formData,
-        createdAt: serverTimestamp(),
-        invitedAt: serverTimestamp(),
-        status: "contacted"
-      });
-
-      // 2. Generate Invite Token & Document
-      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      
-      await setDoc(doc(db, "invites", token), {
-        email: formData.email,
-        dealership: formData.dealership,
-        name: formData.name,
-        address: formData.address || "",
-        leadId: leadRef.id,
-        createdAt: serverTimestamp()
-      });
-      
-      // 3. Send Invite Email
       const appUrl = window.location.origin;
-      const emailResult = await sendInviteEmail(formData.email, formData.dealership, token, appUrl);
+      const result = await submitDealerLead(formData, appUrl);
 
-      if (!emailResult.success) {
-        console.error("Email failed to send:", emailResult.error);
-        // We still show success to the user as the invite is created and lead is saved
+      if (!result.success) {
+        throw new Error(result.error || "Failed to submit lead");
       }
 
       setSuccess(true);
