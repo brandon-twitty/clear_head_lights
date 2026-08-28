@@ -6,8 +6,29 @@ import LeadForm from "@/components/ui/LeadForm";
 import Image from "next/image";
 
 export default function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "AutoRepair",
+    "name": "Clear Head Lights",
+    "image": "https://stlclearheadlights.com/images/before-after-v2.png",
+    "url": "https://stlclearheadlights.com",
+    "telephone": "+13143478886",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Fenton",
+      "addressRegion": "MO",
+      "addressCountry": "US"
+    },
+    "areaServed": ["St. Louis", "Fenton", "Ballwin", "Kirkwood"],
+    "priceRange": "$$"
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-950 font-sans text-slate-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <TopNav />
 
       <main className="flex-grow pt-16">
@@ -20,10 +41,11 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-6">
                 <Sparkles className="w-4 h-4" /> Professional Mobile Service
               </div>
-              <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 text-white leading-tight">
-                Clear. Bright. <br />
-                <span className="text-amber-500">Safe at Night.</span>
+              <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight mb-4 text-white leading-tight">
+                Mobile Headlight Restoration <br />
+                <span className="text-amber-500">in St. Louis</span>
               </h1>
+              <h2 className="text-xl font-semibold text-slate-300 mb-6">Clear. Bright. Safe at Night.</h2>
               <p className="text-lg lg:text-xl text-slate-400 mb-8 max-w-lg leading-relaxed">
                 Did you know that oxidation on modern acrylic headlights can reduce light output by up to <strong className="text-amber-400">80%</strong>? Don't let foggy headlights put your family at risk on dark Missouri roads.
               </p>

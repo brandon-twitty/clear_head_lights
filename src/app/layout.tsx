@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://stlclearheadlights.com"),
   title: "Clear Head Lights | Professional Headlight Restoration",
   description: "Professional-grade mobile headlight restoration service based in Fenton, MO.",
+  keywords: ["mobile headlight restoration", "headlight cleaning", "mobile car detailing", "Fenton MO", "St. Louis", "auto detailing", "headlight repair"],
   openGraph: {
     title: "Clear Head Lights | Call (314) 347-8886", // Added phone number here for maximum visibility
     description: "Don't let foggy headlights put your family at risk. We offer professional-grade mobile headlight restoration in the Fenton, MO area.",
