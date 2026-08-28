@@ -57,15 +57,15 @@ function IndividualBookingContent() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    serviceType: "standard" as "standard" | "single",
-  });
-
   const searchParams = useSearchParams();
+
+  const [formData, setFormData] = useState({
+    name: searchParams.get("name") || "",
+    email: "", // Not collected on homepage
+    phone: searchParams.get("phone") || "",
+    address: searchParams.get("address") || "",
+    serviceType: (searchParams.get("service") as "standard" | "single") || "standard",
+  });
 
   useEffect(() => {
     if (searchParams.get("payment") === "success") {

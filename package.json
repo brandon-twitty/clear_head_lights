@@ -11,8 +11,10 @@
     "stripe:trigger": "stripe trigger payment_intent.succeeded"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^2.1.1",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^7.9.0",
+    "@vis.gl/react-google-maps": "^1.9.0",
     "firebase": "^12.14.0",
     "firebase-admin": "^13.10.0",
     "framer-motion": "^12.40.0",
@@ -20,6 +22,7 @@
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-google-autocomplete": "^2.7.5",
     "resend": "^6.12.4",
     "stripe": "^22.2.0"
   },

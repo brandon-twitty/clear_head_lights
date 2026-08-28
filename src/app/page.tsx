@@ -49,6 +49,16 @@ export default function Home() {
               <p className="text-lg lg:text-xl text-slate-400 mb-8 max-w-lg leading-relaxed">
                 Did you know that oxidation on modern acrylic headlights can reduce light output by up to <strong className="text-amber-400">80%</strong>? Don't let foggy headlights put your family at risk on dark Missouri roads.
               </p>
+              
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-8 max-w-lg">
+                <h3 className="text-red-400 font-bold flex items-center gap-2 mb-1">
+                  <AlertTriangle className="w-5 h-5" /> The Truth About DIY Kits
+                </h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Store-bought DIY kits and "quick wipe" hacks almost never work. If you do manage to get them clear, the results usually only last a month before yellowing again. Stop wasting money on temporary fixes and get a permanent professional UV barrier.
+                </p>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="#book" className="inline-flex justify-center items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 px-8 py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)]">
                   Book Mobile Service <ArrowRight className="w-5 h-5" />
@@ -110,9 +120,13 @@ export default function Home() {
                       <span className="text-slate-300">Standard Mobile Set</span>
                       <strong className="text-white text-xl">$45.00</strong>
                     </li>
-                    <li className="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <li className="flex justify-between items-center border-b border-slate-800 pb-3">
                       <span className="text-slate-300">Single Headlight Fix</span>
                       <strong className="text-white text-xl">$30.00</strong>
+                    </li>
+                    <li className="flex items-start text-slate-300 pt-1">
+                      <CheckCircle2 className="w-5 h-5 text-amber-500 mr-2 shrink-0 mt-0.5" /> 
+                      <span className="text-sm"><strong>Ultimate Convenience:</strong> No waiting in dingy shop lobbies. We come directly to your driveway or workplace.</span>
                     </li>
                   </ul>
                   <Link href="#book" className="w-full inline-flex justify-center items-center bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-lg font-bold transition-colors">
@@ -140,8 +154,12 @@ export default function Home() {
                       <span className="text-slate-300">Partner Pricing (5+ Vehicles)</span>
                       <strong className="text-blue-400 text-xl">$35.00 <span className="text-sm font-normal text-slate-500">/set</span></strong>
                     </li>
-                    <li className="flex items-center text-slate-300 pt-2">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500 mr-2" /> Bypasses costly replacement assemblies
+                    <li className="flex items-center text-slate-300 pt-2 border-b border-slate-800 pb-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 mr-2 shrink-0" /> Bypasses costly replacement assemblies
+                    </li>
+                    <li className="flex items-start text-slate-300 pt-1">
+                      <CheckCircle2 className="w-5 h-5 text-blue-500 mr-2 shrink-0 mt-0.5" /> 
+                      <span className="text-sm"><strong>Exclusive Dealer Portal:</strong> Easily schedule visits, track past vehicles, and manage billing all in one place.</span>
                     </li>
                   </ul>
                   <Link href="/partnership" className="w-full inline-flex justify-center items-center bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-lg font-bold transition-colors">
