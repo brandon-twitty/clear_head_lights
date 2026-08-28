@@ -8,13 +8,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://clearheadlights.com"),
+  metadataBase: new URL("https://stlclearheadlights.com"),
   title: "Clear Head Lights | Professional Headlight Restoration",
   description: "Professional-grade mobile headlight restoration service based in Fenton, MO.",
   openGraph: {
     title: "Clear Head Lights | Professional Headlight Restoration",
     description: "Don't let foggy headlights put your family at risk. We offer professional-grade mobile headlight restoration in the Fenton, MO area.",
-    url: "https://clearheadlights.com",
+    url: "https://stlclearheadlights.com",
     siteName: "Clear Head Lights",
     images: [
       {
