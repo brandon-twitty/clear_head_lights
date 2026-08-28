@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, Suspense, useEffect } from "react";
+import { useState, Suspense, useEffect, useRef } from "react";
 import { Calendar, Lock, CheckCircle2, ArrowRight, X } from "lucide-react";
+import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import Link from "next/link";
@@ -56,6 +57,7 @@ function IndividualBookingContent() {
   const [pendingAppointmentId, setPendingAppointmentId] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
+  const addressInputRef = useRef<HTMLInputElement>(null);
 
   const searchParams = useSearchParams();
 
@@ -74,6 +76,42 @@ function IndividualBookingContent() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (addressInputRef.current) {
+      try {
+        setOptions({
+          key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
+          version: "weekly",
+        });
+      } catch (e) {
+        // ignore already set
+      }
+
+      importLibrary("places").then((placesLib: any) => {
+        if (!placesLib.Autocomplete) return;
+        
+        const autocomplete = new placesLib.Autocomplete(addressInputRef.current, {
+          componentRestrictions: { country: ["us"] },
+          fields: ["formatted_address"],
+          bounds: {
+            north: 39.0,  // Greater St. Louis Area
+            south: 38.3,
+            east: -89.8,
+            west: -90.7
+          },
+          strictBounds: false
+        });
+        
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (place && place.formatted_address) {
+            setFormData(prev => ({ ...prev, address: place.formatted_address }));
+          }
+        });
+      }).catch(console.error);
+    }
+  }, [step]);
 
   const pricing = {
     standard: { amount: 4500, price: 45, label: "Standard Set (Both Headlights)", productId: "prod_UsepnG3itcN0eq" },
@@ -165,8 +203,22 @@ function IndividualBookingContent() {
                   <input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-500 transition outline-none" placeholder="(314) 555-0123" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-300 mb-1">Service Address *</label>
-                  <input required type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-500 transition outline-none" placeholder="123 Main St, City, State" />
+                  <label className="block text-sm font-bold text-slate-300 mb-1">Service Location *</label>
+                  {/* Decoy input to absorb Chrome's aggressive address autofill */}
+                  <input type="text" name="address_decoy" autoComplete="shipping street-address" className="absolute opacity-0 w-px h-px overflow-hidden" tabIndex={-1} aria-hidden="true" />
+                  <input 
+                    required 
+                    ref={addressInputRef} 
+                    type="search" 
+                    name="search_location" 
+                    autoComplete="new-password" 
+                    data-lpignore="true"
+                    onFocus={(e) => { e.target.setAttribute("autocomplete", "new-password"); }}
+                    value={formData.address} 
+                    onChange={e => setFormData({...formData, address: e.target.value})} 
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-500 transition outline-none" 
+                    placeholder="Search location..." 
+                  />
                 </div>
               </div>
 

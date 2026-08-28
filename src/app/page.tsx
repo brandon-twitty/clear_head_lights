@@ -60,9 +60,9 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="#book" className="inline-flex justify-center items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 px-8 py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)]">
+                <a href="#book" className="inline-flex justify-center items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 px-8 py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)]">
                   Book Mobile Service <ArrowRight className="w-5 h-5" />
-                </Link>
+                </a>
                 <Link href="#dealers" className="inline-flex justify-center items-center gap-2 bg-slate-900 border border-slate-700 hover:border-slate-500 text-white px-8 py-4 rounded-xl font-bold transition-all">
                   Dealership Solutions
                 </Link>
@@ -129,9 +129,9 @@ export default function Home() {
                       <span className="text-sm"><strong>Ultimate Convenience:</strong> No waiting in dingy shop lobbies. We come directly to your driveway or workplace.</span>
                     </li>
                   </ul>
-                  <Link href="#book" className="w-full inline-flex justify-center items-center bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-lg font-bold transition-colors">
+                  <a href="#book" className="w-full inline-flex justify-center items-center bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-lg font-bold transition-colors">
                     Schedule Your Vehicle
-                  </Link>
+                  </a>
                 </div>
               </div>
 

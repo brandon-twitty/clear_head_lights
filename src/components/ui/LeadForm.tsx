@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowRight, Building2, User, CheckCircle2, AlertCircle } from "lucide-react";
 import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
+import { submitDealerLead } from "@/actions/submitDealerLead";
 
 export default function LeadForm() {
-  const [formType, setFormType] = useState<"dealership" | "individual">("dealership");
+  const [formType, setFormType] = useState<"dealership" | "individual">("individual");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const addressInputRef = useRef<HTMLInputElement>(null);
@@ -87,11 +88,31 @@ export default function LeadForm() {
       return;
     }
 
-    // Dealership Simulated API call
-    setTimeout(() => {
+    // Dealership real backend call
+    const dealerName = form.querySelector<HTMLInputElement>('input[placeholder="e.g. Sunset Auto Sales"]')?.value || "";
+    const contactPerson = form.querySelector<HTMLInputElement>('input[placeholder="John Doe"]')?.value || "";
+    const dealerEmail = form.querySelector<HTMLInputElement>('input[type="email"]')?.value || "";
+    const dealerPhone = phoneInput?.value || "";
+    const dealerVolume = form.querySelector<HTMLInputElement>('input[type="number"]')?.value || "";
+    const dealerAddress = addressInputRef.current?.value || "";
+
+    const result = await submitDealerLead({
+      dealership: dealerName,
+      name: contactPerson,
+      email: dealerEmail,
+      phone: dealerPhone,
+      inventorySize: dealerVolume,
+      address: dealerAddress,
+      notes: ""
+    }, window.location.origin);
+
+    if (result.success) {
       setStatus("success");
       form.reset();
-    }, 1500);
+    } else {
+      setStatus("error");
+      setErrorMessage(result.error || "Failed to submit request.");
+    }
   };
 
   return (
@@ -99,18 +120,18 @@ export default function LeadForm() {
       {/* Toggle */}
       <div className="flex bg-slate-900 border border-slate-800 rounded-xl p-1 mb-8 w-fit mx-auto">
         <button 
-          onClick={() => { setFormType("dealership"); setStatus("idle"); setErrorMessage(""); }}
-          className={`flex items-center px-6 py-2 rounded-lg font-bold transition-all ${formType === 'dealership' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
-          type="button"
-        >
-          <Building2 className="w-4 h-4 mr-2" /> Dealership
-        </button>
-        <button 
           onClick={() => { setFormType("individual"); setStatus("idle"); setErrorMessage(""); }}
           className={`flex items-center px-6 py-2 rounded-lg font-bold transition-all ${formType === 'individual' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
           type="button"
         >
           <User className="w-4 h-4 mr-2" /> Individual
+        </button>
+        <button 
+          onClick={() => { setFormType("dealership"); setStatus("idle"); setErrorMessage(""); }}
+          className={`flex items-center px-6 py-2 rounded-lg font-bold transition-all ${formType === 'dealership' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}`}
+          type="button"
+        >
+          <Building2 className="w-4 h-4 mr-2" /> Dealership
         </button>
       </div>
 
@@ -159,18 +180,23 @@ export default function LeadForm() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
+                <label className="block text-sm font-bold text-slate-300 mb-2">Email Address <span className="text-red-500">*</span></label>
+                <input required type="email" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="dealer@example.com" />
+              </div>
+              <div>
                 <label className="block text-sm font-bold text-slate-300 mb-2">Phone Number <span className="text-red-500">*</span></label>
                 <input required type="tel" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="(555) 000-0000" />
               </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-300 mb-2">Est. Weekly Volume (Cars)</label>
-                <input type="number" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. 10" />
-              </div>
+            </div>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-slate-300 mb-2">How many cars are you scheduling?</label>
+              <input type="number" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. 10" />
             </div>
             
             <div className="mb-8">
               <label className="block text-sm font-bold text-slate-300 mb-2">Lot Location / Address <span className="text-red-500">*</span></label>
-              <input required ref={addressInputRef} autoComplete="new-password" type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="123 Dealer Row, Fenton, MO" />
+              <input required ref={addressInputRef} autoComplete="one-time-code" type="search" name="q" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="123 Dealer Row, Fenton, MO" />
               {mapsError && <p className="text-red-500 text-xs mt-1">Google Maps could not load, but you can still type your address above.</p>}
             </div>
 
@@ -198,7 +224,7 @@ export default function LeadForm() {
 
             <div className="mb-8">
               <label className="block text-sm font-bold text-slate-300 mb-2">Service Location / Address <span className="text-red-500">*</span></label>
-              <input required ref={addressInputRef} autoComplete="new-password" type="text" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. 123 Main St, St. Louis, MO" />
+              <input required ref={addressInputRef} autoComplete="one-time-code" type="search" name="q" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. 123 Main St, St. Louis, MO" />
               {mapsError && <p className="text-red-500 text-xs mt-1">Google Maps could not load, but you can still type your address above.</p>}
             </div>
 
