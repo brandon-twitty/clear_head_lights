@@ -30,7 +30,7 @@ export default function Footer() {
           <ul className="space-y-3">
             <li className="flex items-center gap-2 text-sm text-slate-400">
               <Phone className="h-5 w-5 text-amber-500" />
-              <span>Call/Text: (314) 347-886</span>
+              <span>Call/Text: (314) 347-8886</span>
             </li>
             <li className="flex items-start gap-2 text-sm text-slate-400">
               <Clock className="h-5 w-5 text-amber-500 shrink-0" />

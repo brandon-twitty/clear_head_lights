@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "Clear Head Lights | Professional Headlight Restoration",
   description: "Professional-grade mobile headlight restoration service based in Fenton, MO.",
   openGraph: {
-    title: "Clear Head Lights | Professional Headlight Restoration",
+    title: "Clear Head Lights | Call (314) 347-8886", // Added phone number here for maximum visibility
     description: "Don't let foggy headlights put your family at risk. We offer professional-grade mobile headlight restoration in the Fenton, MO area.",
     url: "https://stlclearheadlights.com",
     siteName: "Clear Head Lights",
