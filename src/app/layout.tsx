@@ -8,8 +8,31 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://clearheadlights.com"),
   title: "Clear Head Lights | Professional Headlight Restoration",
   description: "Professional-grade mobile headlight restoration service based in Fenton, MO.",
+  openGraph: {
+    title: "Clear Head Lights | Professional Headlight Restoration",
+    description: "Don't let foggy headlights put your family at risk. We offer professional-grade mobile headlight restoration in the Fenton, MO area.",
+    url: "https://clearheadlights.com",
+    siteName: "Clear Head Lights",
+    images: [
+      {
+        url: "/images/before-after-v2.png", // Using the before/after placeholder image for good visual impact
+        width: 1200,
+        height: 630,
+        alt: "Before and After Headlight Restoration",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Clear Head Lights | Professional Headlight Restoration",
+    description: "Professional-grade mobile headlight restoration service based in Fenton, MO.",
+    images: ["/images/before-after-v2.png"],
+  },
 };
 
 import { AuthProvider } from "@/lib/AuthContext";
