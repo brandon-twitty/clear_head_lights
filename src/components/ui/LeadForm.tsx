@@ -18,7 +18,6 @@ export default function LeadForm() {
       try {
         setOptions({
           key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
-          version: "weekly",
         });
       } catch (e) {
         // ignore already set
