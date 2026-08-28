@@ -3,7 +3,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "./firebase";
+import { getAnalytics, isSupported } from "firebase/analytics";
+import { auth, db, app } from "./firebase";
 
 interface AuthContextType {
   user: User | null;
@@ -23,6 +24,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Initialize Firebase Analytics on the client side
+    isSupported().then((supported) => {
+      if (supported) {
+        getAnalytics(app);
+      }
+    });
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
