@@ -194,8 +194,19 @@ export default function LeadForm() {
             </div>
             
             <div className="mb-8">
-              <label className="block text-sm font-bold text-slate-300 mb-2">Lot Location / Address <span className="text-red-500">*</span></label>
-              <input required ref={addressInputRef} autoComplete="one-time-code" type="search" name="q" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="123 Dealer Row, Fenton, MO" />
+              <label className="block text-sm font-bold text-slate-300 mb-2">Lot Location <span className="text-red-500">*</span></label>
+              <input type="text" name="address_decoy" autoComplete="shipping street-address" className="absolute opacity-0 w-px h-px overflow-hidden" tabIndex={-1} aria-hidden="true" />
+              <input 
+                required 
+                ref={addressInputRef} 
+                type="search" 
+                name="search_location" 
+                autoComplete="new-password"
+                data-lpignore="true"
+                onFocus={(e) => { e.target.setAttribute("autocomplete", "new-password"); }}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" 
+                placeholder="Search location..." 
+              />
               {mapsError && <p className="text-red-500 text-xs mt-1">Google Maps could not load, but you can still type your address above.</p>}
             </div>
 
@@ -222,8 +233,19 @@ export default function LeadForm() {
             </div>
 
             <div className="mb-8">
-              <label className="block text-sm font-bold text-slate-300 mb-2">Service Location / Address <span className="text-red-500">*</span></label>
-              <input required ref={addressInputRef} autoComplete="one-time-code" type="search" name="q" className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. 123 Main St, St. Louis, MO" />
+              <label className="block text-sm font-bold text-slate-300 mb-2">Service Location <span className="text-red-500">*</span></label>
+              <input type="text" name="address_decoy" autoComplete="shipping street-address" className="absolute opacity-0 w-px h-px overflow-hidden" tabIndex={-1} aria-hidden="true" />
+              <input 
+                required 
+                ref={addressInputRef} 
+                type="search" 
+                name="search_location" 
+                autoComplete="new-password"
+                data-lpignore="true"
+                onFocus={(e) => { e.target.setAttribute("autocomplete", "new-password"); }}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500" 
+                placeholder="Search location..." 
+              />
               {mapsError && <p className="text-red-500 text-xs mt-1">Google Maps could not load, but you can still type your address above.</p>}
             </div>
 
